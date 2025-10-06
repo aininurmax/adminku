@@ -1,0 +1,96 @@
+<resources>
+    <string name="app_name">Adminku</string>
+
+    <!-- Main Activity -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="store_info">Store Info</string>
+    <string name="performance">Performance</string>
+    <string name="products">Produk</string>
+    <string name="finance">Keuangan</string>
+    <string name="pos">POS</string>
+
+    <!-- Product Management -->
+    <string name="product_management">Manajemen Produk</string>
+    <string name="tab_live">Live</string>
+    <string name="tab_out_of_stock">Habis</string>
+    <string name="tab_archived">Arsipkan</string>
+    <string name="search_hint">Cari nama atau barcode</string>
+    <string name="add_new_product">Tambah Produk Baru</string>
+    <string name="share">Bagikan</string>
+    <string name="archive">Arsipkan</string>
+    <string name="edit">Ubah</string>
+    <string name="price_and_stock">Harga &amp; Stok</string>
+    <string name="copy">Salin</string>
+    <string name="delete">Hapus</string>
+    <string name="cancel">Batal</string>
+    <string name="no_products_found">Tidak ada produk ditemukan</string>
+
+    <!-- Add/Edit Product -->
+    <string name="add_product">Tambah Produk</string>
+    <string name="edit_product">Ubah Produk</string>
+    <string name="product_name">Nama</string>
+    <string name="product_description">Deskripsi</string>
+    <string name="barcode">Barcode</string>
+    <string name="unit">Unit</string>
+    <string name="buy_price">Harga Beli</string>
+    <string name="sell_price">Harga Jual</string>
+    <string name="margin">Margin</string>
+    <string name="cogs_ratio">COGS Ratio</string>
+    <string name="stock">Stok</string>
+    <string name="add_stock">Tambah Stok</string>
+    <string name="category">Kategori</string>
+    <string name="photos">Foto</string>
+    <string name="save">Simpan</string>
+    <string name="show">Tampilkan</string>
+    <string name="select_category">Pilih Kategori</string>
+    <string name="select_unit">Pilih Unit</string>
+    <string name="add_photos">Tambah Foto (Maks. 8)</string>
+
+    <!-- Category Browser -->
+    <string name="browse_categories">Kategori</string>
+    <string name="search_category">Cari kategori</string>
+    <string name="add_category">Tambah Kategori</string>
+    <string name="edit_category">Ubah Kategori</string>
+    <string name="delete_category">Hapus Kategori</string>
+    <string name="category_name">Nama Kategori</string>
+    <string name="select">Pilih</string>
+    <string name="add_subcategory">Tambah Sub-kategori</string>
+    <string name="no_categories_found">Tidak ada kategori ditemukan</string>
+    <string name="max_depth_reached">Maksimum kedalaman kategori tercapai</string>
+    <string name="category_has_children">Kategori memiliki sub-kategori</string>
+    <string name="category_has_products">Kategori memiliki produk terkait</string>
+    <string name="category_name_exists">Nama kategori sudah ada</string>
+
+    <!-- Settings -->
+    <string name="settings">Pengaturan</string>
+    <string name="category_management">Manajemen Kategori</string>
+    <string name="unit_management">Manajemen Unit</string>
+    <string name="store_settings">Pengaturan Toko</string>
+    <string name="app_settings">Pengaturan Aplikasi</string>
+
+    <!-- Units -->
+    <string name="unit_name">Nama Unit</string>
+    <string name="base_unit">Unit Dasar</string>
+    <string name="conversion_factor">Faktor Konversi</string>
+    <string name="add_unit">Tambah Unit</string>
+    <string name="edit_unit">Ubah Unit</string>
+    <string name="delete_unit">Hapus Unit</string>
+
+    <!-- Dialogs -->
+    <string name="confirm">Konfirmasi</string>
+    <string name="confirm_delete">Apakah Anda yakin ingin menghapus?</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="success">Berhasil</string>
+    <string name="error">Error</string>
+    <string name="loading">Memuat…</string>
+
+    <!-- Currency -->
+    <string name="currency_format">Rp %s</string>
+    <string name="percent_format">%s%%</string>
+    <string name="simpan">Simpan</string>
+    <string name="tampilkan">Tampilkan</string>
+    <string name="kategori">Kategori</string>
+    <string name="tambah_produk">Tambah Produk</string>
+    <string name="search_categories">Pencarian</string>
+</resources>
