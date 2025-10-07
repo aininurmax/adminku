@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme colors -->
+    <color name="primary">#FF7043</color>
+    <color name="primary_dark">#E64A19</color>
+    <color name="primary_light">#FFAB91</color>
+    <color name="accent">#FFB74D</color>
+
+    <!-- Dark theme text colors -->
+    <color name="primary_text">#FFFFFF</color>
+    <color name="secondary_text">#B3B3B3</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#404040</color>
+
+    <!-- Dark theme backgrounds -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray_light">#2A2A2A</color>
+    <color name="gray">#1E1E1E</color>
+    <color name="gray_dark">#121212</color>
+
+    <!-- Dark theme backgrounds -->
+    <color name="background">#121212</color>
+    <color name="card_background">#1E1E1E</color>
+
+    <!-- Status colors for dark theme -->
+    <color name="status_live">#66BB6A</color>
+    <color name="status_habis">#EF5350</color>
+    <color name="status_arsip">#757575</color>
+
+    <!-- Additional colors for dark theme -->
+    <color name="red">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#2196F3</color>
+    <color name="yellow">#FFC107</color>
+</resources>
