@@ -2,6 +2,7 @@ package com.bdajaya.adminku.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -22,7 +24,6 @@ import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.model.Breadcrumb;
-import com.bdajaya.adminku.data.model.CategoryWithPath;
 import com.bdajaya.adminku.databinding.ActivityBrowseCategoryBinding;
 import com.bdajaya.adminku.ui.adapter.BreadcrumbAdapter;
 import com.bdajaya.adminku.ui.adapter.CategoryAdapter;
@@ -57,6 +58,31 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.browse_categories);
         }
+
+        // Tambahkan callback untuk back press
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                List<Breadcrumb> breadcrumbs = viewModel.getBreadcrumb().getValue();
+
+                if (viewModel.isSearching().getValue() != null && viewModel.isSearching().getValue()) {
+                    // If searching, clear search first
+                    binding.searchEditText.setText("");
+                    viewModel.clearSearch();
+                } else if (breadcrumbs != null && !breadcrumbs.isEmpty()) {
+                    // If we're not at the root, go up one level
+                    if (breadcrumbs.size() > 1) {
+                        viewModel.jumpToBreadcrumb(breadcrumbs.size() - 2);
+                    } else {
+                        viewModel.loadRoot();
+                    }
+                } else {
+                    // Otherwise, just finish the activity
+                    setEnabled(false);
+                    finish();
+                }
+            }
+        });
 
         setupViewModel();
         setupRecyclerViews();
@@ -174,9 +200,36 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem addCategoryItem = menu.findItem(R.id.action_add_category);
+        if (addCategoryItem != null) {
+            // Update visibility tombol add berdasarkan level saat ini
+            addCategoryItem.setVisible(!viewModel.isMaxDepthReached());
+
+            // Update judul menu sesuai level
+            String menuTitle = getAddCategoryMenuTitle(viewModel.getCurrentCategoryLevel());
+            addCategoryItem.setTitle(menuTitle);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_category, menu);
         return true;
+    }
+
+    private String getAddCategoryMenuTitle(int currentLevel) {
+        switch (currentLevel) {
+            case 0:
+                return getString(R.string.add_main_category);
+            case 1:
+                return getString(R.string.add_subcategory);
+            case 2:
+                return getString(R.string.add_sub_subcategory);
+            default:
+                return getString(R.string.add_category);
+        }
     }
 
     @Override
@@ -185,12 +238,10 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             if (viewModel.isMaxDepthReached()) {
                 Toast.makeText(this, R.string.max_depth_reached, Toast.LENGTH_SHORT).show();
                 return true;
+            } else {
+                showAddCategoryDialog(viewModel.getCurrentParentId());
+                return true;
             }
-            showAddCategoryDialog(viewModel.getCurrentParentId());
-            return true;
-        } else if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -254,25 +305,44 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
     private void showAddCategoryDialog(String parentId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.add_category);
+
+        // Dapatkan level saat ini dari viewModel
+        int currentLevel = viewModel.getCurrentCategoryLevel();
+
+        // Set judul dialog sesuai level
+        builder.setTitle(getAddCategoryMenuTitle(currentLevel));
 
         View view = getLayoutInflater().inflate(R.layout.dialog_add_category, null);
         EditText nameEditText = view.findViewById(R.id.category_name_edit_text);
+
+        // Tambahkan hint sesuai level
+        nameEditText.setHint(getAddCategoryHint(currentLevel));
+
         builder.setView(view);
 
         builder.setPositiveButton(R.string.add_category, (dialog, which) -> {
             String name = nameEditText.getText().toString().trim();
             if (!name.isEmpty()) {
-                String result = viewModel.addCategory(name);
-                if (result != null) {
-                    Toast.makeText(this, getString(R.string.success), Toast.LENGTH_SHORT).show();
-                }
+                // Tambahkan level saat membuat kategori baru
+                viewModel.addCategory(name, currentLevel, parentId);
             }
         });
 
         builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-
         builder.create().show();
+    }
+
+    private String getAddCategoryHint(int level) {
+        switch (level) {
+            case 0:
+                return getString(R.string.hint_main_category);
+            case 1:
+                return getString(R.string.hint_subcategory);
+            case 2:
+                return getString(R.string.hint_sub_subcategory);
+            default:
+                return getString(R.string.hint_category_name);
+        }
     }
 
     private void showSelectCategoryDialog(Category category) {
@@ -287,17 +357,20 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             resultIntent.putExtra("categoryName", category.getName());
 
             // Get the full path
-            List<Category> pathToRoot = viewModel.getBreadcrumb().getValue().stream()
-                    .map(breadcrumb -> new Category(
-                            breadcrumb.getId(),
-                            null,
-                            breadcrumb.getLevel(),
-                            breadcrumb.getName(),
-                            null,
-                            0,
-                            0
-                    ))
-                    .toList();
+            List<Category> pathToRoot = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                pathToRoot = viewModel.getBreadcrumb().getValue().stream()
+                        .map(breadcrumb -> new Category(
+                                breadcrumb.getId(),
+                                null,
+                                breadcrumb.getLevel(),
+                                breadcrumb.getName(),
+                                null,
+                                0,
+                                0
+                        ))
+                        .toList();
+            }
 
             StringBuilder pathString = new StringBuilder();
             for (int i = 0; i < pathToRoot.size(); i++) {
@@ -327,27 +400,6 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         }
 
         builder.create().show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        List<Breadcrumb> breadcrumbs = viewModel.getBreadcrumb().getValue();
-
-        if (viewModel.isSearching().getValue() != null && viewModel.isSearching().getValue()) {
-            // If searching, clear search first
-            binding.searchEditText.setText("");
-            viewModel.clearSearch();
-        } else if (breadcrumbs != null && !breadcrumbs.isEmpty()) {
-            // If we're not at the root, go up one level
-            if (breadcrumbs.size() > 1) {
-                viewModel.jumpToBreadcrumb(breadcrumbs.size() - 2);
-            } else {
-                viewModel.loadRoot();
-            }
-        } else {
-            // Otherwise, just finish the activity
-            super.onBackPressed();
-        }
     }
 }
 

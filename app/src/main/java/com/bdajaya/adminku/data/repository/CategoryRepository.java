@@ -226,4 +226,10 @@ public class CategoryRepository {
             return true; // Safer to assume max depth is reached in case of error
         }
     }
+
+    public void insert(Category newCategory) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            categoryDao.insert(newCategory);
+        });
+    }
 }

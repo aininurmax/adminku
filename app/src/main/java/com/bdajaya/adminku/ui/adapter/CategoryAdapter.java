@@ -15,6 +15,8 @@ import com.bdajaya.adminku.data.entity.Category;
 
 import java.util.List;
 
+import static com.bdajaya.adminku.ui.viewmodel.BrowseCategoryViewModel.MAX_CATEGORY_LEVEL;
+
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
     private List<Category> categories;
@@ -71,13 +73,26 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         void bind(Category category) {
             nameTextView.setText(category.getName());
 
-            // Check if this category has children
-            boolean hasChildren = getChildCount(category) > 0;
+            // Periksa status children dari database
+            boolean hasChildren = checkCategoryChildren(category);
+            // Update visibility berdasarkan level dan status children
+            updateButtonVisibility(category, hasChildren);
 
+            setupClickListeners(category, hasChildren);
+        }
+
+        private void updateButtonVisibility(Category category, boolean hasChildren) {
             chevronImageView.setVisibility(hasChildren ? View.VISIBLE : View.GONE);
-            selectButton.setVisibility(hasChildren ? View.GONE : View.VISIBLE);
-            addSubcategoryButton.setVisibility(View.VISIBLE);
 
+            // Tampilkan tombol select hanya jika tidak memiliki children
+            selectButton.setVisibility(hasChildren ? View.GONE : View.VISIBLE);
+
+            // Tampilkan tombol add subcategory berdasarkan level
+            boolean canAddSubcategory = category.getLevel() < MAX_CATEGORY_LEVEL;
+            addSubcategoryButton.setVisibility(canAddSubcategory ? View.VISIBLE : View.GONE);
+        }
+
+        private void setupClickListeners(Category category, boolean hasChildren) {
             itemView.setOnClickListener(v -> {
                 listener.onCategoryClick(category, hasChildren);
             });
@@ -87,7 +102,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             });
 
             addSubcategoryButton.setOnClickListener(v -> {
-                listener.onAddSubcategoryClick(category);
+                if (category.getLevel() < MAX_CATEGORY_LEVEL) {
+                    listener.onAddSubcategoryClick(category);
+                }
             });
         }
 
@@ -96,6 +113,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             // or use a cached value to determine if a category has children.
             // For now, we'll assume categories with level < 4 might have children.
             return category.getLevel() < 4 ? 1 : 0;
+        }
+
+        private boolean checkCategoryChildren(Category category) {
+            // Implementasi seharusnya menggunakan CategoryRepository untuk mengecek children
+            return getChildCount(category) > 0;
         }
     }
 }

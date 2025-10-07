@@ -12,11 +12,14 @@ import com.bdajaya.adminku.data.repository.CategoryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BrowseCategoryViewModel extends ViewModel {
+    public static final int MAX_CATEGORY_LEVEL = 4; // Sesuaikan dengan kebutuhan
 
     private final CategoryRepository categoryRepository;
 
+    private MutableLiveData<Category> currentCategory = new MutableLiveData<>();
     private final MutableLiveData<List<Breadcrumb>> breadcrumbLiveData = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Category>> currentLevelItemsLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<CategoryWithPath>> searchResultsLiveData = new MutableLiveData<>();
@@ -70,11 +73,12 @@ public class BrowseCategoryViewModel extends ViewModel {
         });
     }
 
-    public void openParent(Category parent) {
+    public void openParent(Category category) {
         isLoadingLiveData.setValue(true);
+        currentCategory.setValue(category);
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<Category> children = categoryRepository.getChildCategoriesSync(parent.getId());
+            List<Category> children = categoryRepository.getChildCategoriesSync(category.getId());
 
             // Update breadcrumb
             List<Breadcrumb> breadcrumbs = breadcrumbLiveData.getValue();
@@ -82,10 +86,10 @@ public class BrowseCategoryViewModel extends ViewModel {
                 breadcrumbs = new ArrayList<>();
             }
 
-            breadcrumbs.add(new Breadcrumb(parent));
+            breadcrumbs.add(new Breadcrumb(category));
             breadcrumbLiveData.postValue(new ArrayList<>(breadcrumbs));
 
-            currentParentId = parent.getId();
+            currentParentId = category.getId();
             currentLevelItemsLiveData.postValue(children);
             isLoadingLiveData.postValue(false);
         });
@@ -136,42 +140,75 @@ public class BrowseCategoryViewModel extends ViewModel {
         searchResultsLiveData.setValue(new ArrayList<>());
     }
 
-    public String addCategory(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            errorMessageLiveData.setValue("Category name cannot be empty");
-            return null;
-        }
+    public void addCategory(String name, int level, String parentId) {
+        isLoadingLiveData.setValue(true);
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                // Generate a new UUID for the category
+                String id = UUID.randomUUID().toString();
+                long now = System.currentTimeMillis();
 
-        try {
-            String result = categoryRepository.addCategory(currentParentId, name.trim());
+                Category newCategory = new Category(
+                        id,          // Generated UUID
+                        parentId,    // Parent ID
+                        level,      // Level
+                        name,       // Name
+                        null,       // No icon URL
+                        now,        // Created at
+                        now        // Updated at
+                );
 
-            if (result == null) {
-                errorMessageLiveData.setValue("Category name already exists at this level");
-                return null;
-            } else if (result.equals("MAX_DEPTH_REACHED")) {
-                errorMessageLiveData.setValue("Maximum category depth reached");
-                return null;
+                // Insert the category
+                categoryRepository.insert(newCategory);
+
+                // Refresh the current level data
+                refreshCurrentLevel();
+                errorMessageLiveData.postValue(null); // Clear any previous errors
+            } catch (Exception e) {
+                errorMessageLiveData.postValue(e.getMessage());
+            } finally {
+                isLoadingLiveData.postValue(false);
             }
-
-            // Refresh current level
-            AppDatabase.databaseWriteExecutor.execute(() -> {
-                List<Category> children = categoryRepository.getChildCategoriesSync(currentParentId);
+        });
+    }
+    private void refreshCurrentLevel() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                List<Category> children;
+                if (currentParentId == null) {
+                    children = categoryRepository.getRootCategoriesSync();
+                } else {
+                    children = categoryRepository.getChildCategoriesSync(currentParentId);
+                }
                 currentLevelItemsLiveData.postValue(children);
-            });
-
-            return result;
-        } catch (Exception e) {
-            errorMessageLiveData.setValue("Error adding category: " + e.getMessage());
-            return null;
-        }
+            } catch (Exception e) {
+                errorMessageLiveData.postValue(e.getMessage());
+            }
+        });
     }
 
-    public boolean isMaxDepthReached() {
-        return categoryRepository.isMaxDepthReached(currentParentId);
-    }
 
     public String getCurrentParentId() {
         return currentParentId;
+    }
+
+    public boolean canAddCategory(Category category) {
+        if (category == null) return  true;
+        return category.getLevel() < MAX_CATEGORY_LEVEL;
+    }
+
+    public Category getCurrentCategory() {
+        List<Category> currentItems = currentLevelItemsLiveData.getValue();
+        return currentItems != null && !currentItems.isEmpty() ? currentItems.get(0) : null;
+    }
+
+    public boolean isMaxDepthReached() {
+        return getCurrentCategoryLevel() >= MAX_CATEGORY_LEVEL;
+    }
+
+    public int getCurrentCategoryLevel() {
+        Category current = getCurrentCategory();
+        return current != null ? current.getLevel() : 0;
     }
 }
 

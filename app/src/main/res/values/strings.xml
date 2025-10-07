@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">Adminku</string>
 
+    <!-- Category Level Titles -->
+    <string name="add_main_category">Tambah Kategori Utama</string>
+    <string name="add_subcategory">Tambah Sub Kategori</string>
+    <string name="add_sub_subcategory">Tambah Sub-Sub Kategori</string>
+
+    <!-- Category Input Hints -->
+    <string name="hint_main_category">Nama Kategori Utama</string>
+    <string name="hint_subcategory">Nama Sub Kategori</string>
+    <string name="hint_sub_subcategory">Nama Sub-Sub Kategori</string>
+    <string name="hint_category_name">Nama Kategori</string>
+
+    <!-- Messages -->
+    <string name="max_depth_reached">Tidak dapat menambah kategori pada level ini</string>
+
     <!-- Main Activity -->
     <string name="dashboard_title">Dashboard</string>
     <string name="store_info">Store Info</string>
@@ -54,9 +68,7 @@
     <string name="delete_category">Hapus Kategori</string>
     <string name="category_name">Nama Kategori</string>
     <string name="select">Pilih</string>
-    <string name="add_subcategory">Tambah Sub-kategori</string>
     <string name="no_categories_found">Tidak ada kategori ditemukan</string>
-    <string name="max_depth_reached">Maksimum kedalaman kategori tercapai</string>
     <string name="category_has_children">Kategori memiliki sub-kategori</string>
     <string name="category_has_products">Kategori memiliki produk terkait</string>
     <string name="category_name_exists">Nama kategori sudah ada</string>

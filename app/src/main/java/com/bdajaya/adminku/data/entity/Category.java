@@ -39,6 +39,10 @@ public class Category {
         this.updatedAt = updatedAt;
     }
 
+    public Category() {
+
+    }
+
     @NonNull
     public String getId() {
         return id;
