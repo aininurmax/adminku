@@ -106,4 +106,6 @@
     <string name="kategori">Kategori</string>
     <string name="tambah_produk">Tambah Produk</string>
     <string name="search_categories">Pencarian</string>
+    <string name="clear_search">Clear Search</string>
+    <string name="tab_layout_for_breadcrumb_navigation">Tab Layout for Breadcrumb Navigation</string>
 </resources>

@@ -30,13 +30,12 @@
                     android:padding="16dp">
 
                 <com.google.android.material.card.MaterialCardView
-                        style="@style/Widget.BDA.Button.TextButton"
-                        android:id="@+id/category_select"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/add_category"
-                        app:cardBackgroundColor="@color/gray"
-                        app:title="@string/kategori" />
+                    style="@style/Widget.BDA.Button.TextButton"
+                    android:id="@+id/category_select"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/add_category"
+                    app:title="@string/kategori" />
 
 
             </LinearLayout>
