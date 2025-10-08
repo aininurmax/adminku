@@ -48,6 +48,8 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private static final long SEARCH_DELAY_MS = 300;
 
+    private boolean isUpdatingBreadcrumb = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Initialize activity and view binding
@@ -61,6 +63,9 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.browse_categories);
         }
+
+        // Enable back button in toolbar
+        binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         // Tambahkan callback untuk back press
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -161,7 +166,17 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
-                viewModel.jumpToBreadcrumb(position);
+                if (position == 0) {
+                    // Root tab - load root categories
+                    if (!isUpdatingBreadcrumb) {
+                        viewModel.loadRoot();
+                    }
+                } else {
+                    // Breadcrumb tabs - navigate to specific level (position - 1 because of root tab)
+                    if (!isUpdatingBreadcrumb) {
+                        viewModel.jumpToBreadcrumb(position - 1);
+                    }
+                }
             }
 
             @Override
@@ -171,7 +186,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                // Not needed
+                // Don't do anything on reselection to avoid infinite loops
             }
         });
     }
@@ -301,26 +316,48 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
 
     private void updateBreadcrumb(List<Breadcrumb> breadcrumbs) {
-        breadcrumbAdapter.updateData(breadcrumbs);
+        if (isUpdatingBreadcrumb) {
+            return; // Prevent infinite loops
+        }
 
-        binding.breadcrumbTabLayout.removeAllTabs();
+        isUpdatingBreadcrumb = true;
 
-        // Add "All Categories" tab if we're not at the root
-        if (!breadcrumbs.isEmpty()) {
+        try {
+            // Update adapter data first
+            breadcrumbAdapter.updateData(breadcrumbs);
+
+            // Clear existing tabs
+            binding.breadcrumbTabLayout.removeAllTabs();
+
+            // Always show root tab first (always selected when no breadcrumbs)
             TabLayout.Tab rootTab = binding.breadcrumbTabLayout.newTab();
             rootTab.setText(R.string.browse_categories);
-            binding.breadcrumbTabLayout.addTab(rootTab, false);
-        }
+            binding.breadcrumbTabLayout.addTab(rootTab);
 
-        // Add tabs for each breadcrumb
-        for (int i = 0; i < breadcrumbs.size(); i++) {
-            Breadcrumb breadcrumb = breadcrumbs.get(i);
-            TabLayout.Tab tab = binding.breadcrumbTabLayout.newTab();
-            tab.setText(breadcrumb.getName());
-            binding.breadcrumbTabLayout.addTab(tab, i == breadcrumbs.size() - 1);
-        }
+            // Add tabs for each breadcrumb level
+            for (int i = 0; i < breadcrumbs.size(); i++) {
+                Breadcrumb breadcrumb = breadcrumbs.get(i);
+                TabLayout.Tab tab = binding.breadcrumbTabLayout.newTab();
+                tab.setText(breadcrumb.getName());
+                binding.breadcrumbTabLayout.addTab(tab);
+            }
 
-        binding.breadcrumbTabLayout.setVisibility(breadcrumbs.isEmpty() ? View.GONE : View.VISIBLE);
+            // Select appropriate tab
+            if (breadcrumbs.isEmpty()) {
+                // At root level - select root tab
+                binding.breadcrumbTabLayout.selectTab(rootTab);
+            } else {
+                // At deeper level - select last breadcrumb tab
+                TabLayout.Tab lastTab = binding.breadcrumbTabLayout.getTabAt(binding.breadcrumbTabLayout.getTabCount() - 1);
+                if (lastTab != null) {
+                    binding.breadcrumbTabLayout.selectTab(lastTab);
+                }
+            }
+
+            binding.breadcrumbTabLayout.setVisibility(View.VISIBLE);
+        } finally {
+            isUpdatingBreadcrumb = false;
+        }
     }
 
     private void showAddCategoryDialog(String parentId) {
@@ -422,4 +459,3 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         builder.create().show();
     }
 }
-
