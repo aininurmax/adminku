@@ -11,7 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bdajaya.adminku.R;
+import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Category;
+import com.bdajaya.adminku.data.repository.CategoryRepository;
 
 import java.util.List;
 
@@ -61,6 +63,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         private final ImageView chevronImageView;
         private final Button selectButton;
         private final Button addSubcategoryButton;
+        private final CategoryRepository categoryRepository;
 
         CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,6 +71,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             chevronImageView = itemView.findViewById(R.id.chevron_image_view);
             selectButton = itemView.findViewById(R.id.select_button);
             addSubcategoryButton = itemView.findViewById(R.id.add_subcategory_button);
+
+            // Get CategoryRepository from context
+            AppDatabase database = AppDatabase.getInstance(itemView.getContext());
+            categoryRepository = new CategoryRepository(database.categoryDao());
         }
 
         void bind(Category category) {
@@ -108,17 +115,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             });
         }
 
-        private int getChildCount(Category category) {
-            // This is a placeholder. In a real app, you would query the database
-            // or use a cached value to determine if a category has children.
-            // For now, we'll assume categories with level < 4 might have children.
-            return category.getLevel() < 4 ? 1 : 0;
-        }
-
         private boolean checkCategoryChildren(Category category) {
-            // Implementasi seharusnya menggunakan CategoryRepository untuk mengecek children
-            return getChildCount(category) > 0;
+            try {
+                // Use CategoryRepository to check if category has children
+                return categoryRepository.getChildCategoriesSync(category.getId()).size() > 0;
+            } catch (Exception e) {
+                // Fallback to simple level check if database query fails
+                return category.getLevel() < 4;
+            }
         }
     }
 }
-

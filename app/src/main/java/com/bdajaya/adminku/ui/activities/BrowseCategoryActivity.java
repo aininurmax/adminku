@@ -24,6 +24,7 @@ import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.model.Breadcrumb;
+import com.bdajaya.adminku.data.model.CategoryWithPath;
 import com.bdajaya.adminku.databinding.ActivityBrowseCategoryBinding;
 import com.bdajaya.adminku.ui.adapter.BreadcrumbAdapter;
 import com.bdajaya.adminku.ui.adapter.CategoryAdapter;
@@ -49,10 +50,12 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Initialize activity and view binding
         super.onCreate(savedInstanceState);
         binding = ActivityBrowseCategoryBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Setup toolbar
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,10 +87,12 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             }
         });
 
+        // Initialize ViewModel and RecyclerViews
         setupViewModel();
         setupRecyclerViews();
         setupSearchView();
 
+        // Observe ViewModel LiveData
         observeViewModel();
 
         // Load root categories
@@ -246,39 +251,54 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     private void observeViewModel() {
         viewModel.getBreadcrumb().observe(this, this::updateBreadcrumb);
-
-        viewModel.getCurrentLevelItems().observe(this, categories -> {
-            categoryAdapter.updateData(categories);
-            binding.emptyView.setVisibility(categories.isEmpty() ? View.VISIBLE : View.GONE);
-        });
-
-        viewModel.getSearchResults().observe(this, results -> {
-            searchAdapter.updateData(results);
-            binding.emptySearchView.setVisibility(results.isEmpty() ? View.VISIBLE : View.GONE);
-        });
-
-        viewModel.isSearching().observe(this, isSearching -> {
-            binding.recyclerViewCategories.setVisibility(isSearching ? View.GONE : View.VISIBLE);
-            binding.recyclerViewSearchResults.setVisibility(isSearching ? View.VISIBLE : View.GONE);
-            binding.emptyView.setVisibility(isSearching ? View.GONE :
-                    (categoryAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE));
-            binding.emptySearchView.setVisibility(isSearching && searchAdapter.getItemCount() == 0 ?
-                    View.VISIBLE : View.GONE);
-            binding.clearSearchButton.setVisibility(isSearching ? View.VISIBLE : View.GONE);
-        });
-
-        viewModel.isLoading().observe(this, isLoading -> {
-            binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        });
-
-        viewModel.getErrorMessage().observe(this, message -> {
-            if (message != null && !message.isEmpty()) {
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        viewModel.getCurrentLevelItems().observe(this, this::updateCategoryList);
+        viewModel.getSearchResults().observe(this, this::updateSearchResults);
+        viewModel.isSearching().observe(this, this::updateSearchState);
+        viewModel.isLoading().observe(this, this::updateLoadingState);
+        viewModel.getErrorMessage().observe(this, this::showErrorMessage);
     }
+
+    private void showErrorMessage(String s) {
+        if (s != null && !s.isEmpty()) {
+            Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateLoadingState(Boolean aBoolean) {
+        binding.progressBar.setVisibility(aBoolean ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateSearchResults(List<CategoryWithPath> categoryWithPaths) {
+        searchAdapter.updateData(categoryWithPaths);
+        updateEmptyViewVisibility(true);
+    }
+
+    private void updateCategoryList(List<Category> categories) {
+        categoryAdapter.updateData(categories);
+        updateEmptyViewVisibility(false);
+        invalidateOptionsMenu(); // Update menu items based on current level
+    }
+
+    private void updateSearchState(boolean isSearching) {
+        binding.recyclerViewCategories.setVisibility(isSearching ? View.GONE : View.VISIBLE);
+        binding.recyclerViewSearchResults.setVisibility(isSearching ? View.VISIBLE : View.GONE);
+        updateEmptyViewVisibility(isSearching);
+        binding.clearSearchButton.setVisibility(isSearching ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateEmptyViewVisibility(boolean isSearching) {
+        if (isSearching) {
+            binding.emptyView.setVisibility(View.GONE);
+        } else {
+            boolean shouldShowEmpty = categoryAdapter.getItemCount() == 0;
+            binding.emptyView.setVisibility(shouldShowEmpty ? View.VISIBLE : View.GONE);
+        }
+    }
+
 
     private void updateBreadcrumb(List<Breadcrumb> breadcrumbs) {
         breadcrumbAdapter.updateData(breadcrumbs);
