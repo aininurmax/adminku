@@ -15,9 +15,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background"
-            android:elevation="4dp"
             android:theme="@style/ThemeOverlay.Material3.ActionBar"
+            app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/ic_back"
             app:menu="@menu/add_category"
             app:title="@string/browse_categories" />
