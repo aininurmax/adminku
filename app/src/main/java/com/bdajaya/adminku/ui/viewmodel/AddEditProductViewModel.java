@@ -2,13 +2,12 @@ package com.bdajaya.adminku.ui.viewmodel;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Product;
 import com.bdajaya.adminku.data.repository.CategoryRepository;
 import com.bdajaya.adminku.data.repository.ProductRepository;
 
-public class MainActivityViewModel extends ViewModel {
+public class AddEditProductViewModel extends ViewModel {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final MutableLiveData<String> productId = new MutableLiveData<>(null);
@@ -19,7 +18,7 @@ public class MainActivityViewModel extends ViewModel {
     private final MutableLiveData<Boolean> saveSuccess = new MutableLiveData<>(false);
     private boolean isEditMode = false;
 
-    public MainActivityViewModel(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public AddEditProductViewModel(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
     }

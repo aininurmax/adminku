@@ -1,78 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                       xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                       xmlns:tools="http://schemas.android.com/tools"
-                                                       android:layout_width="match_parent"
-                                                       android:layout_height="match_parent"
-                                                       tools:context=".ui.activities.MainActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activities.MainActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/animatedBottomBar"/>
+
+    <nl.joery.animatedbottombar.AnimatedBottomBar
+        android:id="@+id/animatedBottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.Material3.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_back"
-        app:menu="@menu/add_category"
-        app:title="@string/tambah_produk" />
+        android:background="#292637"
+        android:elevation="2dp"
+        app:abb_animationDuration="600"
+        app:abb_animationInterpolator="@android:anim/overshoot_interpolator"
+        app:abb_indicatorAppearance="round"
+        app:abb_indicatorColor="#fd907e"
+        app:abb_indicatorHeight="4dp"
+        app:abb_indicatorMargin="16dp"
+        app:abb_selectedIndex="1"
+        app:abb_selectedTabType="text"
+        android:layout_alignParentBottom="true"
+        app:abb_tabAnimation="slide"
+        app:abb_tabColor="#CCFFFFFF"
+        app:abb_tabColorSelected="#fd907e"
+        app:abb_tabs="@menu/menu" />
 
-        <androidx.core.widget.NestedScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:fillViewport="true"
-                app:layout_constraintBottom_toTopOf="@id/buttonContainer"
-                app:layout_constraintTop_toBottomOf="@id/toolbar">
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.BDA.Button.TextButton"
-                    android:id="@+id/category_select"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/add_category"
-                    app:title="@string/kategori" />
-
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-
-        <LinearLayout
-                android:id="@+id/buttonContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                <Button
-                        android:id="@+id/btnSimpan"
-                        style="@style/Widget.BDA.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:text="@string/simpan" />
-
-                <Button
-                        style="@style/Widget.BDA.Button.OutlinedButton"
-                        android:id="@+id/btnTampilkan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="@string/tampilkan" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

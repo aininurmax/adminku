@@ -38,11 +38,11 @@ public class FactoryViewModel implements ViewModelProvider.Factory {
                 throw new IllegalArgumentException("CategoryRepository is required for BrowseCategoryViewModel");
             }
             return (T) new BrowseCategoryViewModel(categoryRepository);
-        } else if (modelClass.isAssignableFrom(MainActivityViewModel.class)) {
+        } else if (modelClass.isAssignableFrom(AddEditProductViewModel.class)) {
             if (productRepository == null || categoryRepository == null) {
                 throw new IllegalArgumentException("All repositories are required for MainActivityViewModel");
             }
-            return (T) new MainActivityViewModel(productRepository, categoryRepository);
+            return (T) new AddEditProductViewModel(productRepository, categoryRepository);
         }
 
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());

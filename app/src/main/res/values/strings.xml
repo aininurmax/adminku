@@ -107,4 +107,7 @@
     <string name="search_categories">Pencarian</string>
     <string name="tab_layout_for_breadcrumb_navigation">Tab Layout for Breadcrumb Navigation</string>
     <string name="clear_search">Clear Search</string>
+    <string name="produk_management">Produk Management</string>
+    <string name="user">Pengguna</string>
+    <string name="accounts">Pengguna</string>
 </resources>
