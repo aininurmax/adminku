@@ -65,7 +65,7 @@
 
     <style name="Widget.BDA.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/primary</item>
-        <item name="rippleColor">@color/primary_light</item>
+        <item name="cornerRadius">8dp</item>
     </style>
 
     <style name="Widget.BDA.TabLayout" parent="Widget.MaterialComponents.TabLayout">

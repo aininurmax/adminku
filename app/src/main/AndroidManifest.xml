@@ -14,16 +14,20 @@
             android:theme="@style/Theme.Adminku">
         <activity
                 android:name=".ui.activities.MainActivity"
-                android:exported="true">
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.activities.BrowseCategoryActivity"
                   android:exported="false"
                   android:theme="@style/Theme.Adminku.NoActionBar"/>
+        <activity
+            android:name=".ui.activities.AddEditProductActivity"
+            android:parentActivityName=".ui.activities.MainActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

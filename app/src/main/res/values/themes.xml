@@ -72,4 +72,12 @@
         <item name="tabSelectedTextColor">@color/primary</item>
         <item name="tabTextColor">@color/secondary_text</item>
     </style>
+
+    <!-- Custom Card Styles -->
+    <style name="Widget.Beshopee.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="cardElevation">4dp</item>
+    </style>
 </resources>

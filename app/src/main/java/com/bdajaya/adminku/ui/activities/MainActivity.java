@@ -1,72 +1,69 @@
 package com.bdajaya.adminku.ui.activities;
 
-import android.content.Intent;
-import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.lifecycle.ViewModelProvider;
-import com.bdajaya.adminku.AdminkuApplication;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import android.os.Bundle;
+import android.util.Log;
+
 import com.bdajaya.adminku.R;
-import com.bdajaya.adminku.databinding.ActivityMainBinding;
-import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
-import com.bdajaya.adminku.ui.viewmodel.MainActivityViewModel;
+import com.bdajaya.adminku.ui.fragments.AccountFragment;
+import com.bdajaya.adminku.ui.fragments.ProductFragment;
+import com.bdajaya.adminku.ui.fragments.HomeFragment;
+
+import org.jetbrains.annotations.NotNull;
+
+import nl.joery.animatedbottombar.AnimatedBottomBar;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_SELECT_CATEGORY = 1001;
-
-    private ActivityMainBinding binding;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    AnimatedBottomBar animatedBottomBar;
+    FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_main);
+        setTitle("Example 1");
 
-        // Handle window insets for edge-to-edge display
-        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        animatedBottomBar = findViewById(R.id.animatedBottomBar);
 
-        // Initialize ViewModel and other components here
-        setupViewModel();
-        setupCategorySelection();
-    }
-    private void setupViewModel() {
-        try {
-            if (!(getApplication() instanceof AdminkuApplication)) {
-                throw new IllegalStateException("Application must be AdminkuApplication. Check AndroidManifest.xml");
+        if (savedInstanceState == null) {
+            animatedBottomBar.selectTabById(R.id.home, true);
+            fragmentManager = getSupportFragmentManager();
+            HomeFragment homeFragment = new HomeFragment();
+            fragmentManager.beginTransaction().replace(R.id.fragment_container, homeFragment)
+                    .commit();
+        }
+
+        animatedBottomBar.setOnTabSelectListener(new AnimatedBottomBar.OnTabSelectListener() {
+            @Override
+            public void onTabReselected(int i, @NotNull AnimatedBottomBar.Tab tab) {
+                // No action on reselection
             }
-            AdminkuApplication application = (AdminkuApplication) getApplication();
-            FactoryViewModel factory = new FactoryViewModel(
-                    application.getProductRepository(),
-                    application.getCategoryRepository()
-            );
-            MainActivityViewModel viewModel = new ViewModelProvider(this, factory).get(MainActivityViewModel.class);
-        } catch (Exception e) {
-            // Log the error and handle gracefully
-            e.printStackTrace();
-            finish(); // Close activity if setup fails
-        }
-    }
 
-    private void setupToolbar() {
-        setSupportActionBar(binding.toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            binding.toolbar.setTitle(R.string.app_name);
-        }
-    }
-    private void setupCategorySelection() {
-        binding.categorySelect.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BrowseCategoryActivity.class);
-            startActivityForResult(intent, REQUEST_SELECT_CATEGORY);
+            @Override
+            public void onTabSelected(int lastIndex, @Nullable AnimatedBottomBar.Tab lastTab, int newIndex, @NotNull AnimatedBottomBar.Tab newTab) {
+                Fragment fragment = null;
+                int tabId = newTab.getId();
+                if (tabId == R.id.home) {
+                    fragment = new HomeFragment();
+                } else if (tabId == R.id.products) {
+                    fragment = new ProductFragment();
+                } else if (tabId == R.id.account) {
+                    fragment = new AccountFragment();
+                }
+
+                if (fragment != null) {
+                    fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
+                            .commit();
+                } else {
+                    Log.e(TAG, "Error in creating Fragment");
+                }
+            }
         });
     }
 }

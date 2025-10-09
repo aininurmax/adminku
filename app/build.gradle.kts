@@ -73,6 +73,9 @@ dependencies {
     // Utilities
     implementation("com.google.code.gson:gson:2.10.1")
 
+    // Animate bottom navigation
+    implementation("nl.joery.animatedbottombar:library:1.1.0")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
