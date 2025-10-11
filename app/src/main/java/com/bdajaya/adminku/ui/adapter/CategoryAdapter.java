@@ -58,6 +58,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     public interface CategoryClickListener {
         void onCategoryClick(Category category, boolean hasChildren);
         void onAddSubcategoryClick(Category category);
+        void onCategoryLongClick(Category category);
     }
 
     class CategoryViewHolder extends RecyclerView.ViewHolder {
@@ -104,6 +105,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         private void setupClickListeners(Category category, boolean hasChildren) {
             itemView.setOnClickListener(v -> {
                 listener.onCategoryClick(category, hasChildren);
+            });
+
+            itemView.setOnLongClickListener(v -> {
+                listener.onCategoryLongClick(category);
+                return true;
             });
 
             selectButton.setOnClickListener(v -> {

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
+import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.model.Breadcrumb;
 import com.bdajaya.adminku.data.model.CategoryWithPath;
@@ -30,6 +31,7 @@ import com.bdajaya.adminku.databinding.ActivityBrowseCategoryBinding;
 import com.bdajaya.adminku.ui.adapter.BreadcrumbAdapter;
 import com.bdajaya.adminku.ui.adapter.CategoryAdapter;
 import com.bdajaya.adminku.ui.adapter.SearchCategoryAdapter;
+import com.bdajaya.adminku.ui.fragments.DeleteCategoryBottomSheet;
 import com.bdajaya.adminku.ui.viewmodel.BrowseCategoryViewModel;
 import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 import com.google.android.material.tabs.TabLayout;
@@ -127,6 +129,11 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             @Override
             public void onAddSubcategoryClick(Category category) {
                 showAddCategoryDialog(category.getId());
+            }
+
+            @Override
+            public void onCategoryLongClick(Category category) {
+                showDeleteCategoryBottomSheet(category);
             }
         }, maxDepth);
 
@@ -468,5 +475,83 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         }
 
         builder.create().show();
+    }
+
+    private void showDeleteCategoryBottomSheet(Category category) {
+        DeleteCategoryBottomSheet bottomSheet = DeleteCategoryBottomSheet.newInstance(category);
+        bottomSheet.setDeleteCategoryListener(this::showDeleteCategoryConfirmationDialog);
+        bottomSheet.show(getSupportFragmentManager(), "deleteCategoryBottomSheet");
+    }
+
+    private void showDeleteCategoryConfirmationDialog(Category category) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.confirm);
+        builder.setMessage(getString(R.string.confirm_delete) + " \"" + category.getName() + "\"?");
+
+        builder.setPositiveButton(R.string.yes, (dialog, which) -> {
+            deleteCategory(category);
+        });
+
+        builder.setNegativeButton(R.string.no, (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        builder.create().show();
+    }
+
+    private void deleteCategory(Category category) {
+        // Get the product DAO for category deletion validation
+        AppDatabase database = AppDatabase.getInstance(this);
+        String result = viewModel.categoryRepository.deleteCategory(category.getId(), database.productDao());
+
+        if ("SUCCESS".equals(result)) {
+            Toast.makeText(this, getString(R.string.success), Toast.LENGTH_SHORT).show();
+
+            // Check if we deleted a category that we're currently viewing
+            // If so, navigate to parent level
+            List<Breadcrumb> breadcrumbs = viewModel.getBreadcrumb().getValue();
+            if (breadcrumbs != null && !breadcrumbs.isEmpty()) {
+                boolean isCurrentCategoryDeleted = false;
+                for (Breadcrumb breadcrumb : breadcrumbs) {
+                    if (breadcrumb.getId().equals(category.getId())) {
+                        isCurrentCategoryDeleted = true;
+                        break;
+                    }
+                }
+
+                if (isCurrentCategoryDeleted) {
+                    // Navigate to parent level
+                    if (breadcrumbs.size() > 1) {
+                        viewModel.jumpToBreadcrumb(breadcrumbs.size() - 2);
+                    } else {
+                        viewModel.loadRoot();
+                    }
+                } else {
+                    // Just refresh current level
+                    viewModel.refreshCurrentLevel();
+                }
+            } else {
+                // Refresh current level
+                viewModel.refreshCurrentLevel();
+            }
+        } else {
+            // Handle delete failure
+            String errorMessage;
+            switch (result) {
+                case "HAS_CHILDREN":
+                    errorMessage = getString(R.string.category_has_children);
+                    break;
+                case "HAS_PRODUCTS":
+                    errorMessage = getString(R.string.category_has_products);
+                    break;
+                case "NOT_FOUND":
+                    errorMessage = "Category not found";
+                    break;
+                default:
+                    errorMessage = getString(R.string.error);
+                    break;
+            }
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+        }
     }
 }

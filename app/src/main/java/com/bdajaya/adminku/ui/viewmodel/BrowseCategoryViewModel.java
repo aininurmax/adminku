@@ -183,7 +183,7 @@ public class BrowseCategoryViewModel extends ViewModel {
             }
         });
     }
-    private void refreshCurrentLevel() {
+    public void refreshCurrentLevel() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             try {
                 List<Category> children;
@@ -194,7 +194,7 @@ public class BrowseCategoryViewModel extends ViewModel {
                 }
                 currentLevelItemsLiveData.postValue(children);
             } catch (Exception e) {
-                errorMessageLiveData.postValue(e.getMessage());
+                // Ignore errors during refresh
             }
         });
     }

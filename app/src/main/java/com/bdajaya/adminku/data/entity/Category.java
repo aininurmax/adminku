@@ -6,8 +6,10 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(indices = {@Index("parentId"), @Index("name")})
-public class Category {
+public class Category implements Serializable {
     @PrimaryKey
     @NonNull
     private String id;
