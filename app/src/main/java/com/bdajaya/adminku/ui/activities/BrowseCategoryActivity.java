@@ -219,6 +219,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         });
     }
 
+    // Update menu items based on current level
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem addCategoryItem = menu.findItem(R.id.action_add_category);
@@ -233,6 +234,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    // Inflate the menu; this adds items to the action bar if it is present.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_category, menu);

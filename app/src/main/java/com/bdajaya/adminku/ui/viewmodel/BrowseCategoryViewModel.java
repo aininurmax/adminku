@@ -24,6 +24,7 @@ public class BrowseCategoryViewModel extends ViewModel {
     private final MutableLiveData<List<Category>> currentLevelItemsLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<CategoryWithPath>> searchResultsLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isSearchingLiveData = new MutableLiveData<>(false);
+    //
     private final MutableLiveData<Boolean> isLoadingLiveData = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessageLiveData = new MutableLiveData<>();
 
