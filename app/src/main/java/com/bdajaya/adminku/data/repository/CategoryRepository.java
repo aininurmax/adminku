@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.dao.CategoryDao;
+import com.bdajaya.adminku.data.dao.ConfigDao;
 import com.bdajaya.adminku.data.dao.ProductDao;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.model.CategoryWithPath;
@@ -17,10 +18,14 @@ import java.util.concurrent.Future;
 
 public class CategoryRepository {
     private final CategoryDao categoryDao;
-    private static final int MAX_DEPTH = 5;
+    private final ConfigDao configDao;
+    private static final int DEFAULT_MAX_DEPTH = 5;
 
-    public CategoryRepository(CategoryDao categoryDao) {
+    // Constructor for cases where ConfigDao is not available (fallback)
+
+    public CategoryRepository(CategoryDao categoryDao, ConfigDao configDao) {
         this.categoryDao = categoryDao;
+        this.configDao = configDao;
     }
 
     public LiveData<List<Category>> getRootCategories() {
@@ -96,7 +101,7 @@ public class CategoryRepository {
                             level = parent.getLevel() + 1;
 
                             // Check max depth
-                            if (level >= MAX_DEPTH) {
+                            if (level >= getMaxDepth()) {
                                 return "MAX_DEPTH_REACHED";
                             }
                         }
@@ -216,7 +221,7 @@ public class CategoryRepository {
                 @Override
                 public Boolean call() {
                     Category parent = categoryDao.getById(parentId);
-                    return parent != null && parent.getLevel() >= MAX_DEPTH - 1;
+                    return parent != null && parent.getLevel() >= getMaxDepth() - 1;
                 }
             });
 
@@ -231,5 +236,19 @@ public class CategoryRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             categoryDao.insert(newCategory);
         });
+    }
+
+    public int getMaxDepth() {
+        if (configDao != null) {
+            try {
+                String value = configDao.getValueByKey("max_category_depth");
+                if (value != null) {
+                    return Integer.parseInt(value);
+                }
+            } catch (Exception e) {
+                // Fallback to default
+            }
+        }
+        return DEFAULT_MAX_DEPTH;
     }
 }

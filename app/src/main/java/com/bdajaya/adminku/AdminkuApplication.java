@@ -21,7 +21,7 @@ public class AdminkuApplication extends Application {
 
         // Initialize repositories
         productRepository = new ProductRepository(database.productDao(), database.productImageDao(), database.categoryDao());
-        categoryRepository = new CategoryRepository(database.categoryDao());
+        categoryRepository = new CategoryRepository(database.categoryDao(), database.configDao());
     }
 
     public AppDatabase getDatabase() {
@@ -36,4 +36,3 @@ public class AdminkuApplication extends Application {
         return categoryRepository;
     }
 }
-

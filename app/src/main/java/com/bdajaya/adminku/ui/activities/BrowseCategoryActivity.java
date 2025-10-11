@@ -1,5 +1,6 @@
 package com.bdajaya.adminku.ui.activities;
 
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Build;
@@ -112,6 +113,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
     private void setupRecyclerViews() {
         // Category list
+        int maxDepth = viewModel.categoryRepository.getMaxDepth(); // Get max depth from repository
         categoryAdapter = new CategoryAdapter(new ArrayList<>(), new CategoryAdapter.CategoryClickListener() {
             @Override
             public void onCategoryClick(Category category, boolean hasChildren) {
@@ -126,7 +128,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             public void onAddSubcategoryClick(Category category) {
                 showAddCategoryDialog(category.getId());
             }
-        });
+        }, maxDepth);
 
         binding.recyclerViewCategories.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewCategories.setAdapter(categoryAdapter);
@@ -298,6 +300,13 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         categoryAdapter.updateData(categories);
         updateEmptyViewVisibility(false);
         invalidateOptionsMenu(); // Update menu items based on current level
+
+        // Add fade in animation for smooth transition
+        if (binding.recyclerViewCategories.getVisibility() == View.VISIBLE) {
+            ObjectAnimator fadeIn = ObjectAnimator.ofFloat(binding.recyclerViewCategories, "alpha", 0f, 1f);
+            fadeIn.setDuration(300);
+            fadeIn.start();
+        }
     }
 
     private void updateSearchState(boolean isSearching) {

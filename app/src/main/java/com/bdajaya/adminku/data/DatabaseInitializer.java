@@ -2,6 +2,7 @@ package com.bdajaya.adminku.data;
 
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Category;
+import com.bdajaya.adminku.data.entity.Config;
 import com.bdajaya.adminku.data.entity.Unit;
 
 import java.util.UUID;
@@ -12,6 +13,9 @@ public class DatabaseInitializer {
         // Initialize base units
         initializeBaseUnits(db);
 
+        // Initialize config values
+        initializeConfig(db);
+
         // Initialize sample categories
         initializeSampleCategories(db);
     }
@@ -20,6 +24,11 @@ public class DatabaseInitializer {
         long now = System.currentTimeMillis();
 
         // Base unit for pieces
+    }
+
+    private static void initializeConfig(AppDatabase db) {
+        Config maxDepthConfig = new Config("max_category_depth", "5");
+        db.configDao().insert(maxDepthConfig);
     }
 
     private static void initializeSampleCategories(AppDatabase db) {
@@ -152,4 +161,3 @@ public class DatabaseInitializer {
         db.categoryDao().insert(womenBlouses);
     }
 }
-

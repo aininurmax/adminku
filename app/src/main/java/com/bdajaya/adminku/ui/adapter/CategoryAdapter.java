@@ -17,16 +17,18 @@ import com.bdajaya.adminku.data.repository.CategoryRepository;
 
 import java.util.List;
 
-import static com.bdajaya.adminku.ui.viewmodel.BrowseCategoryViewModel.MAX_CATEGORY_LEVEL;
+
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
     private List<Category> categories;
     private final CategoryClickListener listener;
+    private final int maxDepth;
 
-    public CategoryAdapter(List<Category> categories, CategoryClickListener listener) {
+    public CategoryAdapter(List<Category> categories, CategoryClickListener listener, int maxDepth) {
         this.categories = categories;
         this.listener = listener;
+        this.maxDepth = maxDepth;
     }
 
     @NonNull
@@ -74,7 +76,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
             // Get CategoryRepository from context
             AppDatabase database = AppDatabase.getInstance(itemView.getContext());
-            categoryRepository = new CategoryRepository(database.categoryDao());
+            categoryRepository = new CategoryRepository(database.categoryDao(), database.configDao());
         }
 
         void bind(Category category) {
@@ -95,7 +97,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             selectButton.setVisibility(hasChildren ? View.GONE : View.VISIBLE);
 
             // Tampilkan tombol add subcategory berdasarkan level
-            boolean canAddSubcategory = category.getLevel() < MAX_CATEGORY_LEVEL;
+            boolean canAddSubcategory = category.getLevel() < maxDepth;
             addSubcategoryButton.setVisibility(canAddSubcategory ? View.VISIBLE : View.GONE);
         }
 
@@ -109,7 +111,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             });
 
             addSubcategoryButton.setOnClickListener(v -> {
-                if (category.getLevel() < MAX_CATEGORY_LEVEL) {
+                if (category.getLevel() < maxDepth) {
                     listener.onAddSubcategoryClick(category);
                 }
             });
@@ -121,7 +123,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
                 return categoryRepository.getChildCategoriesSync(category.getId()).size() > 0;
             } catch (Exception e) {
                 // Fallback to simple level check if database query fails
-                return category.getLevel() < 4;
+                return category.getLevel() < maxDepth - 1;
             }
         }
     }

@@ -1,5 +1,8 @@
 package com.bdajaya.adminku.ui.viewmodel;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -15,9 +18,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class BrowseCategoryViewModel extends ViewModel {
-    public static final int MAX_CATEGORY_LEVEL = 4; // Sesuaikan dengan kebutuhan
+    // Removed hardcoded MAX_CATEGORY_LEVEL, now using dynamic from repository
 
-    private final CategoryRepository categoryRepository;
+    public final CategoryRepository categoryRepository;
 
     private MutableLiveData<Category> currentCategory = new MutableLiveData<>();
     private final MutableLiveData<List<Breadcrumb>> breadcrumbLiveData = new MutableLiveData<>(new ArrayList<>());
@@ -103,6 +106,7 @@ public class BrowseCategoryViewModel extends ViewModel {
         }
 
         isLoadingLiveData.setValue(true);
+        long startTime = System.currentTimeMillis();
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
             // Get the selected breadcrumb
@@ -116,7 +120,14 @@ public class BrowseCategoryViewModel extends ViewModel {
             List<Category> children = categoryRepository.getChildCategoriesSync(selected.getId());
             currentParentId = selected.getId();
             currentLevelItemsLiveData.postValue(children);
-            isLoadingLiveData.postValue(false);
+
+            // Ensure minimum loading duration for smooth UX
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            long remainingTime = Math.max(0, 500 - elapsedTime);
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                isLoadingLiveData.setValue(false);
+            }, remainingTime);
         });
     }
 
@@ -194,8 +205,8 @@ public class BrowseCategoryViewModel extends ViewModel {
     }
 
     public boolean canAddCategory(Category category) {
-        if (category == null) return  true;
-        return category.getLevel() < MAX_CATEGORY_LEVEL;
+        if (category == null) return true;
+        return category.getLevel() < categoryRepository.getMaxDepth();
     }
 
     public Category getCurrentCategory() {
@@ -204,7 +215,7 @@ public class BrowseCategoryViewModel extends ViewModel {
     }
 
     public boolean isMaxDepthReached() {
-        return getCurrentCategoryLevel() >= MAX_CATEGORY_LEVEL;
+        return getCurrentCategoryLevel() >= categoryRepository.getMaxDepth();
     }
 
     public int getCurrentCategoryLevel() {
@@ -212,4 +223,3 @@ public class BrowseCategoryViewModel extends ViewModel {
         return current != null ? current.getLevel() : 0;
     }
 }
-
