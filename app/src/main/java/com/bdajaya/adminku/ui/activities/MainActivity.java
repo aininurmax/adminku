@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.bdajaya.adminku.R;
 import com.bdajaya.adminku.ui.fragments.AccountFragment;
@@ -65,5 +67,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Called when products card is clicked (defined in XML with onClick attribute)
+     */
+    @Deprecated
+    public void onProductsCardClick(View view) {
+        Intent intent = new Intent(this, ProductManagementActivity.class);
+        startActivity(intent);
+
+        // Gunakan API baru untuk Android 14+ (API 34)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(
+                    OVERRIDE_TRANSITION_OPEN,
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left
+            );
+        } else {
+            // Fix deprecated method for older versions
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }
+    }
+
+    /**
+     * Called when finance card is clicked (defined in XML with onClick attribute)
+     */
+    public void onFinanceCardClick(View view) {
+        // TODO: Navigate to finance activity when implemented
+        Log.d(TAG, "Finance card clicked - feature not yet implemented");
+    }
+
+    /**
+     * Called when accounts card is clicked (defined in XML with onClick attribute)
+     */
+    public void onAccountsCardClick(View view) {
+        // TODO: Navigate to accounts activity when implemented
+        Log.d(TAG, "Accounts card clicked - feature not yet implemented");
     }
 }

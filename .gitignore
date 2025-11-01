@@ -128,3 +128,14 @@ fabric.properties
 
 
 .ai
+# Keystore files - NEVER commit these!
+*.jks
+*.keystore
+keystore/
+keystore.properties
+
+# Local configuration files
+local.properties
+
+# Signing files
+release/

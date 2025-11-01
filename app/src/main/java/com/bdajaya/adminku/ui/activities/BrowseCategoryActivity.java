@@ -1,9 +1,7 @@
 package com.bdajaya.adminku.ui.activities;
 
-import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,7 +10,10 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -23,22 +24,37 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
-import com.bdajaya.adminku.data.AppDatabase;
+import com.bdajaya.adminku.core.Constants;
+import com.bdajaya.adminku.core.ErrorHandler;
+import com.bdajaya.adminku.core.ValidationUtils;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.model.Breadcrumb;
 import com.bdajaya.adminku.data.model.CategoryWithPath;
+import com.bdajaya.adminku.data.repository.CategoryRepository;
 import com.bdajaya.adminku.databinding.ActivityBrowseCategoryBinding;
 import com.bdajaya.adminku.ui.adapter.BreadcrumbAdapter;
 import com.bdajaya.adminku.ui.adapter.CategoryAdapter;
 import com.bdajaya.adminku.ui.adapter.SearchCategoryAdapter;
-import com.bdajaya.adminku.ui.fragments.DeleteCategoryBottomSheet;
+import com.bdajaya.adminku.ui.fragments.AddCategoryBottomSheet;
+import com.bdajaya.adminku.ui.fragments.CategoryOptionsBottomSheet;
+import com.bdajaya.adminku.ui.fragments.ConfirmationBottomSheet;
+import com.bdajaya.adminku.ui.fragments.UpdateCategoryBottomSheet;
 import com.bdajaya.adminku.ui.viewmodel.BrowseCategoryViewModel;
 import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for browsing and managing categories with improved architecture and error handling.
+ * This activity focuses on UI coordination and delegates business logic to ViewModel and Use Cases.
+ *
+ * @author Adminku Development Team
+ * @version 2.1.0
+ */
 public class BrowseCategoryActivity extends AppCompatActivity {
 
     private ActivityBrowseCategoryBinding binding;
@@ -49,9 +65,8 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     private BreadcrumbAdapter breadcrumbAdapter;
 
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
-    private static final long SEARCH_DELAY_MS = 300;
-
     private boolean isUpdatingBreadcrumb = false;
+    private Category currentSelectedCategory; // Untuk menyimpan kategori yang dipilih
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +83,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         }
 
         // Enable back button in toolbar
-        binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        binding.toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         // Tambahkan callback untuk back press
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -78,6 +93,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
                 if (viewModel.isSearching().getValue() != null && viewModel.isSearching().getValue()) {
                     // If searching, clear search first
+                    hideKeyboard();
                     binding.searchEditText.setText("");
                     viewModel.clearSearch();
                 } else if (breadcrumbs != null && !breadcrumbs.isEmpty()) {
@@ -115,14 +131,14 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
     private void setupRecyclerViews() {
         // Category list
-        int maxDepth = viewModel.categoryRepository.getMaxDepth(); // Get max depth from repository
         categoryAdapter = new CategoryAdapter(new ArrayList<>(), new CategoryAdapter.CategoryClickListener() {
             @Override
             public void onCategoryClick(Category category, boolean hasChildren) {
                 if (hasChildren) {
                     viewModel.openParent(category);
                 } else {
-                    showSelectCategoryDialog(category);
+                    // Langsung return kategori yang dipilih tanpa dialog konfirmasi
+                    returnSelectedCategory(category);
                 }
             }
 
@@ -133,34 +149,29 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
             @Override
             public void onCategoryLongClick(Category category) {
-                showDeleteCategoryBottomSheet(category);
+                showCategoryOptionsDialog(category);
             }
-        }, maxDepth);
+        });
 
         binding.recyclerViewCategories.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewCategories.setAdapter(categoryAdapter);
 
         // Search results
         searchAdapter = new SearchCategoryAdapter(new ArrayList<>(), categoryWithPath -> {
-            // When a search result is clicked, navigate to that category
+            // When a search result is clicked, select the category and return it
             Category category = categoryWithPath.getCategory();
-            List<Category> path = categoryWithPath.getPathToRoot();
+
+            // Hide keyboard for better UX
+            hideKeyboard();
 
             // Clear search first
             binding.searchEditText.setText("");
             viewModel.clearSearch();
 
-            // Navigate to the category by simulating breadcrumb clicks
-            viewModel.loadRoot();
-
-            // We need to navigate through the path in reverse order (from root to leaf)
-            for (int i = path.size() - 1; i >= 0; i--) {
-                final int index = i;
-                // We need to delay each navigation to allow the UI to update
-                new Handler().postDelayed(() -> {
-                    viewModel.openParent(path.get(index));
-                }, (path.size() - 1 - i) * 100L);
-            }
+            // Add small delay for smoother transition before returning result
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                returnSelectedCategoryWithPath(category, categoryWithPath);
+            }, 150);
         });
 
         binding.recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(this));
@@ -200,18 +211,30 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets up the search view with debouncing and proper error handling.
+     */
     private void setupSearchView() {
         binding.searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 searchHandler.removeCallbacksAndMessages(null);
 
-                if (s.length() > 0) {
-                    searchHandler.postDelayed(() -> viewModel.search(s.toString()), SEARCH_DELAY_MS);
+                if (s != null && s.length() > 0) {
+                    // Use Constants for search delay
+                    searchHandler.postDelayed(() -> {
+                        try {
+                            viewModel.search(s.toString());
+                        } catch (Exception e) {
+                            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error during search", e);
+                            showErrorMessage(Constants.ERROR_UNEXPECTED);
+                        }
+                    }, Constants.SEARCH_DEBOUNCE_DELAY_MS);
                 } else {
                     viewModel.clearSearch();
                 }
@@ -219,28 +242,20 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // No action needed
             }
         });
 
         binding.clearSearchButton.setOnClickListener(v -> {
-            binding.searchEditText.setText("");
-            viewModel.clearSearch();
+            try {
+                // Hide keyboard for better UX
+                hideKeyboard();
+                binding.searchEditText.setText("");
+                viewModel.clearSearch();
+            } catch (Exception e) {
+                ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error clearing search", e);
+            }
         });
-    }
-
-    // Update menu items based on current level
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem addCategoryItem = menu.findItem(R.id.action_add_category);
-        if (addCategoryItem != null) {
-            // Update visibility tombol add berdasarkan level saat ini
-            addCategoryItem.setVisible(!viewModel.isMaxDepthReached());
-
-            // Update judul menu sesuai level
-            String menuTitle = getAddCategoryMenuTitle(viewModel.getCurrentCategoryLevel());
-            addCategoryItem.setTitle(menuTitle);
-        }
-        return super.onPrepareOptionsMenu(menu);
     }
 
     // Inflate the menu; this adds items to the action bar if it is present.
@@ -250,22 +265,27 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         return true;
     }
 
-    private String getAddCategoryMenuTitle(int currentLevel) {
-        switch (currentLevel) {
+    // Update method getAddCategoryMenuTitle untuk menggunakan depth
+    private String getAddCategoryMenuTitle(int currentDepth) {
+        switch (currentDepth) {
             case 0:
                 return getString(R.string.add_main_category);
             case 1:
                 return getString(R.string.add_subcategory);
             case 2:
                 return getString(R.string.add_sub_subcategory);
+            case 3:
+                return getString(R.string.add_sub_sub_subcategory);
             default:
                 return getString(R.string.add_category);
         }
     }
 
+    // PERBAIKI BARIS 262 - Extract common logic
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_add_category) {
+            // Gunakan method yang sudah diperbaiki
             if (viewModel.isMaxDepthReached()) {
                 Toast.makeText(this, R.string.max_depth_reached, Toast.LENGTH_SHORT).show();
                 return true;
@@ -276,8 +296,6 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
     private void observeViewModel() {
         viewModel.getBreadcrumb().observe(this, this::updateBreadcrumb);
@@ -307,13 +325,6 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         categoryAdapter.updateData(categories);
         updateEmptyViewVisibility(false);
         invalidateOptionsMenu(); // Update menu items based on current level
-
-        // Add fade in animation for smooth transition
-        if (binding.recyclerViewCategories.getVisibility() == View.VISIBLE) {
-            ObjectAnimator fadeIn = ObjectAnimator.ofFloat(binding.recyclerViewCategories, "alpha", 0f, 1f);
-            fadeIn.setDuration(300);
-            fadeIn.start();
-        }
     }
 
     private void updateSearchState(boolean isSearching) {
@@ -332,29 +343,21 @@ public class BrowseCategoryActivity extends AppCompatActivity {
         }
     }
 
-
     private void updateBreadcrumb(List<Breadcrumb> breadcrumbs) {
-        if (isUpdatingBreadcrumb) {
-            return; // Prevent infinite loops
-        }
-
+        if (isUpdatingBreadcrumb) return;
         isUpdatingBreadcrumb = true;
 
         try {
-            // Update adapter data first
             breadcrumbAdapter.updateData(breadcrumbs);
-
-            // Clear existing tabs
             binding.breadcrumbTabLayout.removeAllTabs();
 
-            // Always show root tab first (always selected when no breadcrumbs)
+            // Always show root tab
             TabLayout.Tab rootTab = binding.breadcrumbTabLayout.newTab();
             rootTab.setText(R.string.browse_categories);
             binding.breadcrumbTabLayout.addTab(rootTab);
 
-            // Add tabs for each breadcrumb level
-            for (int i = 0; i < breadcrumbs.size(); i++) {
-                Breadcrumb breadcrumb = breadcrumbs.get(i);
+            // Add breadcrumb tabs
+            for (Breadcrumb breadcrumb : breadcrumbs) {
                 TabLayout.Tab tab = binding.breadcrumbTabLayout.newTab();
                 tab.setText(breadcrumb.getName());
                 binding.breadcrumbTabLayout.addTab(tab);
@@ -362,196 +365,352 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
             // Select appropriate tab
             if (breadcrumbs.isEmpty()) {
-                // At root level - select root tab
                 binding.breadcrumbTabLayout.selectTab(rootTab);
             } else {
-                // At deeper level - select last breadcrumb tab
-                TabLayout.Tab lastTab = binding.breadcrumbTabLayout.getTabAt(binding.breadcrumbTabLayout.getTabCount() - 1);
+                TabLayout.Tab lastTab = binding.breadcrumbTabLayout.getTabAt(
+                        binding.breadcrumbTabLayout.getTabCount() - 1
+                );
                 if (lastTab != null) {
                     binding.breadcrumbTabLayout.selectTab(lastTab);
                 }
             }
-
-            binding.breadcrumbTabLayout.setVisibility(View.VISIBLE);
         } finally {
             isUpdatingBreadcrumb = false;
         }
     }
 
+    /**
+     * Shows the add category bottom sheet with validation and error handling.
+     *
+     * @param parentId The parent category ID (null for root categories)
+     */
     private void showAddCategoryDialog(String parentId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        try {
+            // Get current level from viewModel
+            int currentLevel = viewModel.getCurrentCategoryLevel();
 
-        // Dapatkan level saat ini dari viewModel
-        int currentLevel = viewModel.getCurrentCategoryLevel();
+            // Create and show bottom sheet
+            AddCategoryBottomSheet bottomSheet = AddCategoryBottomSheet.newInstance(parentId, currentLevel);
+            bottomSheet.setOnCategoryActionListener(new AddCategoryBottomSheet.OnCategoryActionListener() {
+                @Override
+                public void onCategoryAdded(String categoryName) {
+                    try {
+                        // Validate input
+                        ValidationUtils.ValidationResult validation = ValidationUtils.validateCategoryName(categoryName);
+                        if (validation.isFailure()) {
+                            Toast.makeText(BrowseCategoryActivity.this, validation.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-        // Set judul dialog sesuai level
-        builder.setTitle(getAddCategoryMenuTitle(currentLevel));
+                        // Let ViewModel/CategoryRepository handle level calculation and validation
+                        viewModel.addCategory(categoryName, parentId);
+                    } catch (Exception e) {
+                        ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error adding category", e);
+                        Toast.makeText(BrowseCategoryActivity.this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+                    }
+                }
 
-        View view = getLayoutInflater().inflate(R.layout.dialog_add_category, null);
-        EditText nameEditText = view.findViewById(R.id.category_name_edit_text);
+                @Override
+                public void onCancel() {
+                    // Nothing to do, bottom sheet will dismiss automatically
+                }
+            });
 
-        // Tambahkan hint sesuai level
-        nameEditText.setHint(getAddCategoryHint(currentLevel));
+            bottomSheet.show(getSupportFragmentManager(), "AddCategoryBottomSheet");
 
-        builder.setView(view);
-
-        builder.setPositiveButton(R.string.add_category, (dialog, which) -> {
-            String name = nameEditText.getText().toString().trim();
-            if (!name.isEmpty()) {
-                // Tambahkan level saat membuat kategori baru
-                viewModel.addCategory(name, currentLevel, parentId);
-            }
-        });
-
-        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-        builder.create().show();
-    }
-
-    private String getAddCategoryHint(int level) {
-        switch (level) {
-            case 0:
-                return getString(R.string.hint_main_category);
-            case 1:
-                return getString(R.string.hint_subcategory);
-            case 2:
-                return getString(R.string.hint_sub_subcategory);
-            default:
-                return getString(R.string.hint_category_name);
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error showing add category bottom sheet", e);
+            Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showSelectCategoryDialog(Category category) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.select_category);
-        builder.setMessage(category.getName());
+    private void returnSelectedCategory(Category category) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("categoryId", category.getId());
+        resultIntent.putExtra("categoryName", category.getName());
 
-        builder.setPositiveButton(R.string.select, (dialog, which) -> {
-            // Return the selected category to the caller
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("categoryId", category.getId());
-            resultIntent.putExtra("categoryName", category.getName());
+        // Build path string dari breadcrumb
+        List<Breadcrumb> breadcrumbs = viewModel.getBreadcrumb().getValue();
+        StringBuilder pathString = new StringBuilder();
 
-            // Get the full path
-            List<Category> pathToRoot = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                pathToRoot = viewModel.getBreadcrumb().getValue().stream()
-                        .map(breadcrumb -> new Category(
-                                breadcrumb.getId(),
-                                null,
-                                breadcrumb.getLevel(),
-                                breadcrumb.getName(),
-                                null,
-                                0,
-                                0
-                        ))
-                        .toList();
-            }
-
-            StringBuilder pathString = new StringBuilder();
-            for (int i = 0; i < pathToRoot.size(); i++) {
-                pathString.append(pathToRoot.get(i).getName());
-                if (i < pathToRoot.size() - 1) {
+        if (breadcrumbs != null && !breadcrumbs.isEmpty()) {
+            for (int i = 0; i < breadcrumbs.size(); i++) {
+                pathString.append(breadcrumbs.get(i).getName());
+                if (i < breadcrumbs.size() - 1) {
                     pathString.append(" > ");
                 }
             }
-
-            if (!pathToRoot.isEmpty()) {
-                pathString.append(" > ");
-            }
-            pathString.append(category.getName());
-
-            resultIntent.putExtra("pathString", pathString.toString());
-
-            setResult(RESULT_OK, resultIntent);
-            finish();
-        });
-
-        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-
-        if (!viewModel.isMaxDepthReached()) {
-            builder.setNeutralButton(R.string.add_subcategory, (dialog, which) -> {
-                showAddCategoryDialog(category.getId());
-            });
+            pathString.append(" > ");
         }
+        pathString.append(category.getName());
 
-        builder.create().show();
+        resultIntent.putExtra("pathString", pathString.toString());
+        resultIntent.putExtra("categoryLevel", category.getLevel());
+
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 
-    private void showDeleteCategoryBottomSheet(Category category) {
-        DeleteCategoryBottomSheet bottomSheet = DeleteCategoryBottomSheet.newInstance(category);
-        bottomSheet.setDeleteCategoryListener(this::showDeleteCategoryConfirmationDialog);
-        bottomSheet.show(getSupportFragmentManager(), "deleteCategoryBottomSheet");
+    private void returnSelectedCategoryWithPath(Category category, CategoryWithPath categoryWithPath) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("categoryId", category.getId());
+        resultIntent.putExtra("categoryName", category.getName());
+
+        // Use the full path from CategoryWithPath instead of current breadcrumb
+        String pathString = categoryWithPath.getPathString();
+        resultIntent.putExtra("pathString", pathString);
+        resultIntent.putExtra("categoryLevel", category.getLevel());
+
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 
-    private void showDeleteCategoryConfirmationDialog(Category category) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.confirm);
-        builder.setMessage(getString(R.string.confirm_delete) + " \"" + category.getName() + "\"?");
+    /**
+     * Modern, clean, dan robust implementation untuk showCategoryOptionsDialog
+     */
+    private void showCategoryOptionsDialog(@NonNull Category category) {
+        try {
+            // Validasi input
+            if (category == null || category.getId() == null) {
+                ErrorHandler.logError(ErrorHandler.ERROR_CODE_VALIDATION,
+                        "Invalid category for options dialog", null);
+                return;
+            }
 
-        builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-            deleteCategory(category);
-        });
+            // Use the Bottom Sheet fragment instead of AlertDialog
+            CategoryOptionsBottomSheet bottomSheet = CategoryOptionsBottomSheet.newInstance(
+                    category.getId(),
+                    category.getName()
+            );
 
-        builder.setNegativeButton(R.string.no, (dialog, which) -> {
-            dialog.dismiss();
-        });
-
-        builder.create().show();
-    }
-
-    private void deleteCategory(Category category) {
-        // Get the product DAO for category deletion validation
-        AppDatabase database = AppDatabase.getInstance(this);
-        String result = viewModel.categoryRepository.deleteCategory(category.getId(), database.productDao());
-
-        if ("SUCCESS".equals(result)) {
-            Toast.makeText(this, getString(R.string.success), Toast.LENGTH_SHORT).show();
-
-            // Check if we deleted a category that we're currently viewing
-            // If so, navigate to parent level
-            List<Breadcrumb> breadcrumbs = viewModel.getBreadcrumb().getValue();
-            if (breadcrumbs != null && !breadcrumbs.isEmpty()) {
-                boolean isCurrentCategoryDeleted = false;
-                for (Breadcrumb breadcrumb : breadcrumbs) {
-                    if (breadcrumb.getId().equals(category.getId())) {
-                        isCurrentCategoryDeleted = true;
-                        break;
-                    }
-                }
-
-                if (isCurrentCategoryDeleted) {
-                    // Navigate to parent level
-                    if (breadcrumbs.size() > 1) {
-                        viewModel.jumpToBreadcrumb(breadcrumbs.size() - 2);
+            bottomSheet.setOnCategoryOptionSelectedListener(new CategoryOptionsBottomSheet.OnCategoryOptionSelectedListener() {
+                @Override
+                public void onAddSubcategory() {
+                    if (viewModel.canAddSubcategoryTo(category)) {
+                        showAddCategoryDialog(category.getId());
                     } else {
-                        viewModel.loadRoot();
+                        Toast.makeText(BrowseCategoryActivity.this,
+                                R.string.max_depth_reached, Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    // Just refresh current level
-                    viewModel.refreshCurrentLevel();
                 }
-            } else {
-                // Refresh current level
-                viewModel.refreshCurrentLevel();
-            }
-        } else {
-            // Handle delete failure
-            String errorMessage;
-            switch (result) {
-                case "HAS_CHILDREN":
-                    errorMessage = getString(R.string.category_has_children);
-                    break;
-                case "HAS_PRODUCTS":
-                    errorMessage = getString(R.string.category_has_products);
-                    break;
-                case "NOT_FOUND":
-                    errorMessage = "Category not found";
-                    break;
-                default:
-                    errorMessage = getString(R.string.error);
-                    break;
-            }
-            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+
+                @Override
+                public void onUpdateCategory() {
+                    showUpdateCategoryDialog(category);
+                }
+
+                @Override
+                public void onDeleteCategory() {
+                    showDeleteCategoryConfirmation(category);
+                }
+
+                @Override
+                public void onCancel() {
+                    // Clean up resources if needed
+                    currentSelectedCategory = null;
+                }
+            });
+
+            bottomSheet.show(getSupportFragmentManager(), "CategoryOptionsBottomSheet");
+
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
+                    "Error showing category options dialog", e);
+            Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Shows the update category bottom sheet with validation and error handling.
+     *
+     * @param category The category to update
+     */
+    private void showUpdateCategoryDialog(Category category) {
+        if (category == null) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_VALIDATION, "Cannot update null category", null);
+            Toast.makeText(this, Constants.ERROR_INVALID_INPUT, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            // Create and show bottom sheet
+            UpdateCategoryBottomSheet bottomSheet = UpdateCategoryBottomSheet.newInstance(category);
+            bottomSheet.setOnCategoryUpdateListener(new UpdateCategoryBottomSheet.OnCategoryUpdateListener() {
+                @Override
+                public void onCategoryUpdated(String categoryId, String newName) {
+                    try {
+                        // Validate input
+                        ValidationUtils.ValidationResult validation = ValidationUtils.validateCategoryName(newName);
+                        if (validation.isFailure()) {
+                            Toast.makeText(BrowseCategoryActivity.this, validation.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Check if name actually changed
+                        if (newName.equals(category.getName())) {
+                            Toast.makeText(BrowseCategoryActivity.this, "Nama kategori tidak berubah", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        viewModel.updateCategory(categoryId, newName);
+                    } catch (Exception e) {
+                        ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error updating category", e);
+                        Toast.makeText(BrowseCategoryActivity.this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancel() {
+                    // Nothing to do, bottom sheet will dismiss automatically
+                }
+            });
+
+            bottomSheet.show(getSupportFragmentManager(), "UpdateCategoryBottomSheet");
+
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error showing update category bottom sheet", e);
+            Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Professional implementation untuk showDeleteCategoryConfirmation
+     * Menggunakan ViewModel pattern dengan benar
+     */
+    private void showDeleteCategoryConfirmation(@NonNull Category category) {
+        if (category == null || category.getId() == null) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_VALIDATION,
+                    "Invalid category for deletion confirmation", null);
+            return;
+        }
+
+        currentSelectedCategory = category;
+        showCustomDeleteCategoryConfirmation(category);
+    }
+
+    /**
+     * Robust implementation untuk showCustomDeleteCategoryConfirmation
+     * Menggunakan ViewModel untuk data fetching
+     */
+    private void showCustomDeleteCategoryConfirmation(@NonNull Category category) {
+        // Show loading state
+        binding.progressBar.setVisibility(View.VISIBLE);
+
+        // Use ViewModel to get deletion info
+        viewModel.getCategoryDeletionInfo(category.getId()).observe(this, deletionInfo -> {
+            binding.progressBar.setVisibility(View.GONE);
+
+            if (deletionInfo != null) {
+                showCustomConfirmationDialog(category, deletionInfo);
+            } else {
+                ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
+                        "Failed to get category deletion info", null);
+                Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+            }
+
+            // Remove observer to prevent memory leaks
+            viewModel.getCategoryDeletionInfo(category.getId()).removeObservers(this);
+        });
+    }
+
+    /**
+     * Modern confirmation dialog dengan structured data
+     */
+    private void showCustomConfirmationDialog(@NonNull Category category,
+                                              @NonNull BrowseCategoryViewModel.CategoryDeletionInfo deletionInfo) {
+        try {
+            // Create and show bottom sheet dengan semua informasi yang diperlukan
+            ConfirmationBottomSheet bottomSheet = ConfirmationBottomSheet.newInstance(
+                    category,
+                    deletionInfo.hasChildren(),
+                    deletionInfo.hasProducts(),
+                    deletionInfo.getProductCount()
+            );
+
+            bottomSheet.setOnConfirmationActionListener(new ConfirmationBottomSheet.OnConfirmationActionListener() {
+                @Override
+                public void onConfirmDelete(Object itemToDelete) {
+                    if (itemToDelete instanceof Category) {
+                        Category categoryToDelete = (Category) itemToDelete;
+                        deleteCategory(categoryToDelete);
+                    }
+                }
+
+                @Override
+                public void onCancel() {
+                    // Clean up
+                    currentSelectedCategory = null;
+                }
+            });
+
+            bottomSheet.show(getSupportFragmentManager(), "ConfirmationBottomSheet");
+
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
+                    "Error showing confirmation bottom sheet", e);
+            Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Efficient deleteCategory method dengan proper error handling
+     */
+    private void deleteCategory(@NonNull Category category) {
+        if (category == null || category.getId() == null) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_VALIDATION,
+                    "Invalid category for deletion", null);
+            return;
+        }
+
+        // Show loading state
+        binding.progressBar.setVisibility(View.VISIBLE);
+
+        // Observe deletion result
+        viewModel.getErrorMessage().observe(this, errorMessage -> {
+            binding.progressBar.setVisibility(View.GONE);
+
+            if (errorMessage == null) {
+                // Success case
+                Toast.makeText(BrowseCategoryActivity.this,
+                        R.string.category_deleted_successfully, Toast.LENGTH_SHORT).show();
+
+                // Auto-refresh handled by ViewModel observers
+            } else {
+                // Error case - already shown by ViewModel observer
+                ErrorHandler.logError(ErrorHandler.ERROR_CODE_DELETION,
+                        "Category deletion failed: " + errorMessage, null);
+            }
+
+            // Clean up
+            currentSelectedCategory = null;
+            // Remove observer after one-time use
+            viewModel.getErrorMessage().removeObservers(this);
+        });
+
+        // Execute deletion
+        viewModel.deleteCategory(category.getId(), (AdminkuApplication) getApplication());
+    }
+
+    /**
+     * Hides the soft keyboard for better user experience.
+     */
+    private void hideKeyboard() {
+        try {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (imm != null && getCurrentFocus() != null) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error hiding keyboard", e);
+        }
+    }
+
+    // Tambahkan method cleanup di onDestroy
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up any pending operations
+        currentSelectedCategory = null;
+        searchHandler.removeCallbacksAndMessages(null);
     }
 }

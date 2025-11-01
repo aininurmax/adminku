@@ -8,21 +8,34 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(
-        indices = {
-                @Index(value = "barcode", unique = true),
-                @Index("name"),
-                @Index("categoryId"),
-                @Index("unitId"),
-                @Index("status")
-        },
-        foreignKeys = {
-                @ForeignKey(
-                        entity = Category.class,
-                        parentColumns = "id",
-                        childColumns = "categoryId",
-                        onDelete = ForeignKey.SET_NULL
-                )
-        }
+    indices = {
+        @Index(value = "barcode", unique = true),
+        @Index("name"),
+        @Index("categoryId"),
+        @Index("unitId"),
+        @Index("brandId"),
+        @Index("status")
+    },
+    foreignKeys = {
+        @ForeignKey(
+            entity = Category.class,
+            parentColumns = "id",
+            childColumns = "categoryId",
+            onDelete = ForeignKey.SET_NULL
+        ),
+        @ForeignKey(
+            entity = Unit.class,
+            parentColumns = "id",
+            childColumns = "unitId",
+            onDelete = ForeignKey.RESTRICT
+        ),
+        @ForeignKey(
+            entity = Brand.class,
+            parentColumns = "id",
+            childColumns = "brandId",
+            onDelete = ForeignKey.SET_NULL
+        )
+    }
 )
 public class Product {
     @PrimaryKey
@@ -40,6 +53,9 @@ public class Product {
 
     @Nullable
     private String categoryId;
+
+    @Nullable
+    private String brandId;
 
     @NonNull
     private String unitId;
@@ -60,14 +76,15 @@ public class Product {
     private long updatedAt;
 
     public Product(@NonNull String id, @NonNull String name, @Nullable String description,
-                   @NonNull String barcode, @Nullable String categoryId, @NonNull String unitId,
-                   long buyPrice, long sellPrice, int margin, long stock, @NonNull String status,
-                   long createdAt, long updatedAt) {
+                  @NonNull String barcode, @Nullable String categoryId, @Nullable String brandId,
+                  @NonNull String unitId, long buyPrice, long sellPrice, int margin, long stock,
+                  @NonNull String status, long createdAt, long updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.barcode = barcode;
         this.categoryId = categoryId;
+        this.brandId = brandId;
         this.unitId = unitId;
         this.buyPrice = buyPrice;
         this.sellPrice = sellPrice;
@@ -121,6 +138,15 @@ public class Product {
 
     public void setCategoryId(@Nullable String categoryId) {
         this.categoryId = categoryId;
+    }
+
+    @Nullable
+    public String getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(@Nullable String brandId) {
+        this.brandId = brandId;
     }
 
     @NonNull

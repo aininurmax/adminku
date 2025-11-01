@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="base_units">
+        <item>pcs (Pieces)</item>
+        <item>gr (Gram)</item>
+    </string-array>
+</resources>

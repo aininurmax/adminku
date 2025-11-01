@@ -80,4 +80,43 @@
         <item name="android:layout_margin">8dp</item>
         <item name="cardElevation">4dp</item>
     </style>
+
+    <style name="BottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/BottomSheetShapeAppearance</item>
+    </style>
+
+    <style name="BottomSheetShapeAppearance" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <!-- Dialog Styles for Proper Corner Radius -->
+    <style name="DialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitlePanelStyle">@style/DialogTitlePanelStyle</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/DialogTitleTextStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+        <item name="android:background">@drawable/dialog_background</item>
+        <item name="shapeAppearanceOverlay">@style/DialogShapeAppearance</item>
+    </style>
+
+    <style name="DialogShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="DialogTitlePanelStyle">
+        <item name="android:background">@drawable/dialog_background</item>
+    </style>
+
+    <style name="DialogTitleTextStyle">
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DialogButtonStyle">
+        <item name="android:textColor">@color/primary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
 </resources>

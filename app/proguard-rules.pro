@@ -19,3 +19,29 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Room Database
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep class * extends com.bumptech.glide.module.AppGlideModule {
+ <init>(...);
+}
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+}
+
+# AndroidX Navigation
+-keep class androidx.navigation.** { *; }
+-keep class androidx.navigation.NavType { *; }
+-keep class androidx.navigation.NavType$Companion { *; }
+
+-dontobfuscate
+-optimizationpasses 5
+-overloadaggressively
+-repackageclasses ''
+-allowaccessmodification

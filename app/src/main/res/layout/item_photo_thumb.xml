@@ -1,0 +1,37 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="84dp"
+    android:layout_height="84dp"
+    android:layout_margin="6dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Kotak foto 72dp dengan border dashed -->
+    <FrameLayout
+        android:id="@+id/btnDrag"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_dashed_border_8" />
+    </FrameLayout>
+
+    <!-- Tombol remove “menggantung” di luar sudut kanan-atas -->
+    <ImageView
+        android:id="@+id/btnRemove"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="end|top"
+        android:src="@drawable/ic_cancel"
+        android:background="@drawable/bg_remove_circle"
+        android:translationX="6dp"
+        android:translationY="-6dp"
+        android:padding="6dp"
+        app:tint="@color/white" />
+
+</FrameLayout>

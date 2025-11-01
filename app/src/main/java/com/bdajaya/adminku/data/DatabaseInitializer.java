@@ -2,7 +2,6 @@ package com.bdajaya.adminku.data;
 
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Category;
-import com.bdajaya.adminku.data.entity.Config;
 import com.bdajaya.adminku.data.entity.Unit;
 
 import java.util.UUID;
@@ -13,9 +12,6 @@ public class DatabaseInitializer {
         // Initialize base units
         initializeBaseUnits(db);
 
-        // Initialize config values
-        initializeConfig(db);
-
         // Initialize sample categories
         initializeSampleCategories(db);
     }
@@ -23,12 +19,52 @@ public class DatabaseInitializer {
     private static void initializeBaseUnits(AppDatabase db) {
         long now = System.currentTimeMillis();
 
-        // Base unit for pieces
-    }
+        // Base units
+        Unit pcs = new Unit(
+                UUID.randomUUID().toString(),
+                "pcs",
+                "pcs",
+                1,
+                true,
+                now,
+                now
+        );
 
-    private static void initializeConfig(AppDatabase db) {
-        Config maxDepthConfig = new Config("max_category_depth", "5");
-        db.configDao().insert(maxDepthConfig);
+        Unit gram = new Unit(
+                UUID.randomUUID().toString(),
+                "gram",
+                "gram",
+                1,
+                true,
+                now,
+                now
+        );
+
+        // Derived units
+        Unit dozen = new Unit(
+                UUID.randomUUID().toString(),
+                "dozen",
+                "pcs",
+                12,
+                false,
+                now,
+                now
+        );
+
+        Unit kg = new Unit(
+                UUID.randomUUID().toString(),
+                "kg",
+                "gram",
+                1000,
+                false,
+                now,
+                now
+        );
+
+        db.unitDao().insert(pcs);
+        db.unitDao().insert(gram);
+        db.unitDao().insert(dozen);
+        db.unitDao().insert(kg);
     }
 
     private static void initializeSampleCategories(AppDatabase db) {
@@ -42,6 +78,7 @@ public class DatabaseInitializer {
                 0,
                 "Fashion",
                 null,
+                true, // Fashion has children (Wanita, Pria, Anak-anak)
                 now,
                 now
         );
@@ -53,6 +90,7 @@ public class DatabaseInitializer {
                 0,
                 "Electronics",
                 null,
+                false, // Assume no children initially
                 now,
                 now
         );
@@ -64,6 +102,7 @@ public class DatabaseInitializer {
                 0,
                 "Grocery",
                 null,
+                false, // Assume no children initially
                 now,
                 now
         );
@@ -76,6 +115,7 @@ public class DatabaseInitializer {
                 1,
                 "Wanita",
                 null,
+                true, // Women has children (Atasan, Bawahan)
                 now,
                 now
         );
@@ -87,6 +127,7 @@ public class DatabaseInitializer {
                 1,
                 "Pria",
                 null,
+                false, // Assume no children initially
                 now,
                 now
         );
@@ -98,6 +139,7 @@ public class DatabaseInitializer {
                 1,
                 "Anak-anak",
                 null,
+                false, // Assume no children initially
                 now,
                 now
         );
@@ -110,6 +152,7 @@ public class DatabaseInitializer {
                 2,
                 "Atasan",
                 null,
+                true, // Tops has children (Kaos, Blouse)
                 now,
                 now
         );
@@ -121,6 +164,7 @@ public class DatabaseInitializer {
                 2,
                 "Bawahan",
                 null,
+                false, // Assume no children initially
                 now,
                 now
         );
@@ -133,6 +177,7 @@ public class DatabaseInitializer {
                 3,
                 "Kaos",
                 null,
+                false, // Leaf category
                 now,
                 now
         );
@@ -144,6 +189,7 @@ public class DatabaseInitializer {
                 3,
                 "Blouse",
                 null,
+                false, // Leaf category
                 now,
                 now
         );

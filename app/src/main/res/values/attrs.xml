@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared -->
+    <attr name="positionGroup" format="enum">
+        <enum name="first" value="0"/>
+        <enum name="middle" value="1"/>
+        <enum name="last" value="2"/>
+        <enum name="solo" value="3"/>
+    </attr>
+    <attr name="titleAlignment" format="enum">
+        <enum name="start" value="0"/>
+        <enum name="center" value="1"/>
+        <enum name="end" value="2"/>
+    </attr>
+
+    <!-- CardInputView -->
+    <declare-styleable name="CardInputView">
+        <attr name="civ_title" format="string"/>
+        <attr name="civ_hintText" format="string"/>
+        <attr name="civ_valueText" format="string"/>
+        <attr name="civ_inputType" format="enum">
+            <enum name="TEXT" value="0"/>
+            <enum name="NUMBER" value="1"/>
+            <enum name="DECIMAL" value="2"/>
+            <enum name="CURRENCY" value="3"/>
+            <enum name="BARCODE" value="4"/>
+            <enum name="STOCK" value="5"/>
+        </attr>
+        <attr name="civ_textCase" format="enum">
+            <enum name="UPPERCASE" value="0"/>
+            <enum name="PROPER" value="1"/>
+            <enum name="SENTENCE" value="2"/>
+        </attr>
+        <attr name="civ_required" format="boolean"/>
+        <attr name="civ_multiline" format="boolean"/>
+        <attr name="civ_counterEnabled" format="boolean"/>
+        <attr name="civ_maxLength" format="integer"/>
+        <attr name="civ_showIcon" format="boolean"/>
+        <attr name="civ_iconSrc" format="reference"/>
+
+        <attr name="civ_titleAlignment" format="enum"/>
+        <attr name="civ_positionGroup" format="enum">
+            <enum name="first" value="0"/>
+            <enum name="middle" value="1"/>
+            <enum name="last" value="2"/>
+            <enum name="solo" value="3"/>
+        </attr>
+
+        <attr name="civ_colorBackground" format="color"/>
+        <attr name="civ_colorTitle" format="color"/>
+        <attr name="civ_colorIcon" format="color"/>
+        <attr name="civ_colorInput" format="color"/>
+        <attr name="civ_colorStroke" format="color"/>
+        <attr name="civ_colorRequire" format="color"/>
+
+        <!-- Layout mode -->
+        <attr name="civ_compactHorizontal" format="boolean"/>
+    </declare-styleable>
+
+    <!-- CardSelectView -->
+    <declare-styleable name="CardSelectView">
+        <attr name="csv_title" format="string"/>
+        <attr name="csv_value" format="string"/>
+        <attr name="csv_required" format="boolean"/>
+        <attr name="csv_showIcon" format="boolean"/>
+        <attr name="csv_colorBackground" format="color"/>
+        <attr name="csv_colorInput" format="color"/>
+        <attr name="csv_colorTitle" format="color"/>
+        <attr name="csv_colorIcon" format="color"/>
+        <attr name="csv_colorRequired" format="color"/>
+        <attr name="csv_colorStroke" format="color"/>
+        <attr name="csv_positionGroup" format="enum">
+            <enum name="first" value="0"/>
+            <enum name="middle" value="1"/>
+            <enum name="last" value="2"/>
+            <enum name="solo" value="3"/>
+        </attr>
+        <attr name="csv_iconSrc" format="reference"/>
+    </declare-styleable>
+
+    <!-- CardPhotoSelector -->
+    <declare-styleable name="CardPhotoSelector">
+        <attr name="cps_title" format="string"/>
+        <attr name="cps_maxCount" format="integer"/>
+        <attr name="cps_colorBackground" format="color"/>
+        <attr name="cps_colorTitle" format="color"/>
+        <attr name="cps_colorStroke" format="color"/>
+        <attr name="cps_required" format="boolean"/>
+        <attr name="cps_colorRequired" format="color"/>
+        <attr name="cps_positionGroup" format="enum">
+            <enum name="first" value="0"/>
+            <enum name="middle" value="1"/>
+            <enum name="last" value="2"/>
+            <enum name="solo" value="3"/>
+        </attr>
+    </declare-styleable>
+</resources>

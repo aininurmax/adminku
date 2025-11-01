@@ -9,17 +9,14 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.Material3.ActionBar">
 
-        <com.google.android.material.appbar.MaterialToolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.Material3.ActionBar"
-            app:layout_constraintTop_toTopOf="parent"
-            app:navigationIcon="@drawable/ic_back"
-            app:menu="@menu/add_category"
-            app:title="@string/browse_categories" />
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/background" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,6 +39,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/search_background"
                     android:drawableStart="@drawable/ic_search"
+                    android:drawablePadding="8dp"
                     android:hint="@string/search_categories"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
@@ -67,7 +65,7 @@
                 android:id="@+id/breadcrumb_tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/gray"
+                android:background="@color/gray_dark"
                 android:contentDescription="@string/tab_layout_for_breadcrumb_navigation"
                 app:tabGravity="start"
                 app:tabMode="scrollable"
@@ -86,7 +84,7 @@
             android:id="@+id/recycler_view_categories"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:padding="8dp"
+            android:padding="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

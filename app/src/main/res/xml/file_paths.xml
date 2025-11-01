@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- External storage -->
+    <external-path
+        name="external_files"
+        path="." />
+
+    <!-- Cache directory untuk sharing -->
+    <cache-path
+        name="shared_images"
+        path="." />
+
+    <!-- Internal files directory untuk storage utama -->
+    <files-path
+        name="internal_files"
+        path="." />
+
+    <!-- Spesifik untuk product images di cache saat sharing -->
+    <cache-path
+        name="share_cache"
+        path="share_cache/" />
+</paths>

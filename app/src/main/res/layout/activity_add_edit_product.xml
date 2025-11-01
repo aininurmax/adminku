@@ -1,78 +1,248 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                       xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                       xmlns:tools="http://schemas.android.com/tools"
-                                                       android:layout_width="match_parent"
-                                                       android:layout_height="match_parent"
-                                                       tools:context=".ui.activities.AddEditProductActivity">
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.Material3.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_back"
-        app:menu="@menu/add_category"
-        app:title="@string/tambah_produk" />
+        android:layout_height="wrap_content">
 
-        <androidx.core.widget.NestedScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:fillViewport="true"
-                app:layout_constraintBottom_toTopOf="@id/buttonContainer"
-                app:layout_constraintTop_toBottomOf="@id/toolbar">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/toolbar_background"
+            android:theme="@style/ThemeOverlay.Material3.ActionBar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/add_product"
+            app:layout_scrollFlags="enterAlways"/>
+        
+    </com.google.android.material.appbar.AppBarLayout>
 
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.BDA.Button.TextButton"
-                    android:id="@+id/category_select"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/add_category"
-                    app:title="@string/kategori" />
-
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+    <!-- Konten scroll -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/tambah_produk"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
-                android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.bdajaya.adminku.ui.components.CardPhotoSelector
+                android:id="@+id/photoSelector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:cps_colorTitle="@color/text_primary_light_dark"
+                app:cps_colorStroke="@color/card_background"
+                app:cps_required="true"
+                app:cps_colorRequired="@color/primary"
+                app:cps_title="@string/product_photos"
+                app:cps_maxCount="8"
+                app:cps_positionGroup="solo"/>
 
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/nameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/product_name"
+                app:civ_required="true"
+                app:civ_colorRequire="@color/primary"
+                app:civ_inputType="TEXT"
+                app:civ_textCase="PROPER"
+                app:civ_counterEnabled="true"
+                app:civ_maxLength="255"
+                app:civ_hintText="@string/hint_product_name"
+                app:civ_positionGroup="solo"/>
 
-                <Button
-                        android:id="@+id/btnSimpan"
-                        style="@style/Widget.BDA.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:text="@string/simpan" />
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/descInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/product_description"
+                app:civ_inputType="TEXT"
+                app:civ_multiline="true"
+                app:civ_counterEnabled="true"
+                app:civ_maxLength="3000"
+                app:civ_hintText="@string/hint_product_description"
+                app:civ_positionGroup="solo"/>
 
-                <Button
-                        style="@style/Widget.BDA.Button.OutlinedButton"
-                        android:id="@+id/btnTampilkan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="@string/tampilkan" />
-            </LinearLayout>
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/barcodeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/barcode"
+                app:civ_inputType="BARCODE"
+                app:civ_hintText="1234567"
+                app:civ_positionGroup="first"
+                app:civ_showIcon="true"
+                app:civ_colorIcon="@color/icons"
+                app:civ_iconSrc="@drawable/ic_barcode"/>
+
+            <com.bdajaya.adminku.ui.components.CardSelectView
+                android:id="@+id/categorySelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:csv_colorStroke="@color/card_background"
+                app:csv_colorTitle="@color/text_primary_light_dark"
+                app:csv_title="@string/category"
+                app:csv_required="true"
+                app:csv_colorRequired="@color/primary"
+                app:csv_positionGroup="middle"
+                app:csv_colorIcon="@color/icons"
+                app:csv_showIcon="true"/>
+
+            <com.bdajaya.adminku.ui.components.CardSelectView
+                android:id="@+id/brandSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:csv_colorStroke="@color/card_background"
+                app:csv_colorTitle="@color/text_primary_light_dark"
+                app:csv_title="@string/brand"
+                app:csv_positionGroup="last"
+                app:csv_colorIcon="@color/icons"
+                app:csv_showIcon="false"/>
+
+            <!-- BUY -->
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/buyPriceInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/buy_price"
+                app:civ_hintText="Rp0"
+                app:civ_inputType="CURRENCY"
+                app:civ_compactHorizontal="false"
+                app:civ_positionGroup="first"
+                app:civ_showIcon="true"
+                app:civ_colorIcon="@color/icons"
+                app:civ_iconSrc="@drawable/ic_price_tag"/>
+
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/buyStockInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/stock"
+                app:civ_hintText="Masukkan stok"
+                app:civ_inputType="STOCK"
+                app:civ_compactHorizontal="false"
+                app:civ_positionGroup="middle"
+                app:civ_showIcon="true"
+                app:civ_colorIcon="@color/icons"
+                app:civ_iconSrc="@drawable/ic_stack"/>
+
+            <com.bdajaya.adminku.ui.components.CardSelectView
+                android:id="@+id/buyUnitSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:csv_colorStroke="@color/card_background"
+                app:csv_colorTitle="@color/text_primary_light_dark"
+                app:csv_title="@string/unit"
+                app:csv_positionGroup="last"
+                app:csv_iconSrc="@drawable/ic_unit"/>
+
+            <!-- SELL -->
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/sellPriceInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_marginTop="8dp"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/sell_price"
+                app:civ_hintText="Rp0"
+                app:civ_inputType="CURRENCY"
+                app:civ_compactHorizontal="true"
+                app:civ_positionGroup="first"
+                app:civ_showIcon="true"
+                app:civ_colorIcon="@color/icons"
+                app:civ_iconSrc="@drawable/ic_price_tag"/>
+
+            <com.bdajaya.adminku.ui.components.CardInputView
+                android:id="@+id/sellStockInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                app:civ_colorStroke="@color/card_background"
+                app:civ_colorTitle="@color/text_primary_light_dark"
+                app:civ_title="@string/stock"
+                app:civ_hintText="Masukkan stok"
+                app:civ_inputType="STOCK"
+                app:civ_compactHorizontal="true"
+                app:civ_positionGroup="middle"
+                app:civ_showIcon="true"
+                app:civ_colorIcon="@color/icons"
+                app:civ_iconSrc="@drawable/ic_stack"/>
+
+            <com.bdajaya.adminku.ui.components.CardSelectView
+                android:id="@+id/sellUnitSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="60dp"
+                app:csv_colorStroke="@color/card_background"
+                app:csv_colorTitle="@color/text_primary_light_dark"
+                app:csv_title="@string/unit"
+                app:csv_positionGroup="last"
+                app:csv_iconSrc="@drawable/ic_unit"/>
 
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!--Button group statis-->
+    <LinearLayout
+        android:id="@+id/buttonGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@color/toolbar_background"
+        android:gravity="center">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="@string/archive"/>
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="1dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLive"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="@string/tab_live"/>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

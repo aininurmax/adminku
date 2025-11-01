@@ -3,9 +3,10 @@
     <color name="primary">#FF5722</color>
     <color name="primary_dark">#E64A19</color>
     <color name="primary_light">#FFCCBC</color>
-    <color name="accent">#FF9800</color>
+    <color name="accent">#FF5722</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
+    <color name="text_primary_light_dark">#282C34</color>
     <color name="icons">#121212</color>
     <color name="divider">#BDBDBD</color>
     <color name="white">#FFFFFF</color>
@@ -22,4 +23,34 @@
     <color name="status_live">#4CAF50</color>
     <color name="status_habis">#F44336</color>
     <color name="status_arsip">#9E9E9E</color>
+    <color name="toolbar_background">#FFFFFF</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="shimmer_color">#DDDDDD</color>
+
+    <!-- Material Design 3 Colors for Dialogs -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F8F8F8</color>
+    <color name="outline">#79747E</color>
+    <color name="error">#B3261E</color>
+    <color name="error_container">#F9DEDC</color>
+    <color name="on_error_container">#410002</color>
+
+    <color name="card_bg">#FFFFFFFF</color>
+    <color name="card_stroke">#FFE5E7EB</color>
+    <color name="title">#FF111827</color>
+    <color name="hint">#FF9CA3AF</color>
+    <color name="value">#FF111827</color>
+    <color name="danger">#FFEF4444</color>
+    <color name="chip_bg">#FFF3F4F6</color>
+
+    <!-- Stock Badge Colors -->
+    <color name="stock_badge_background">#E3F2FD</color>
+    <color name="stock_icon">#1976D2</color>
+    <color name="stock_text">#0D47A1</color>
+    <color name="unit_text">#1565C0</color>
+    <color name="image_background">#F5F5F5</color>
+
+    // ic name
+    <color name="buzMavisi">#0099ff</color>
 </resources>

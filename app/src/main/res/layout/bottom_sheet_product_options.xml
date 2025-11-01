@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/option_share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/share"
+            android:src="@drawable/ic_share"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/share"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option_archive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/archive"
+            android:src="@drawable/ic_archive"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:id="@+id/option_archive_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/archive"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/edit"
+            android:src="@drawable/ic_edit"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/edit"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option_price_stock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/price_and_stock"
+            android:src="@drawable/ic_price_stock"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/price_and_stock"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option_copy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/copy"
+            android:src="@drawable/ic_copy"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/copy"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_menu_delete"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/delete"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/option_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/cancel"
+            android:src="@drawable/ic_cancel"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/cancel"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+</LinearLayout>

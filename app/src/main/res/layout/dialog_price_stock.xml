@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Buy Price -->
+    <com.bdajaya.adminku.ui.components.CardInputView
+        android:id="@+id/buyPriceInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:civ_title="@string/buy_price"
+        app:civ_inputType="CURRENCY"
+        app:civ_hintText="Rp0"
+        app:civ_showIcon="true"
+        app:civ_iconSrc="@drawable/ic_price_tag"
+        app:civ_positionGroup="first"/>
+
+    <!-- Sell Price -->
+    <com.bdajaya.adminku.ui.components.CardInputView
+        android:id="@+id/sellPriceInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:civ_title="@string/sell_price"
+        app:civ_inputType="CURRENCY"
+        app:civ_hintText="Rp0"
+        app:civ_showIcon="true"
+        app:civ_iconSrc="@drawable/ic_price_tag"
+        app:civ_positionGroup="middle"/>
+
+    <!-- Margin -->
+    <com.bdajaya.adminku.ui.components.CardInputView
+        android:id="@+id/marginInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:civ_title="@string/margin"
+        app:civ_inputType="NUMBER"
+        app:civ_hintText="0%"
+        app:civ_showIcon="true"
+        app:civ_iconSrc="@drawable/ic_percent"
+        app:civ_positionGroup="last"/>
+
+    <!-- Stock -->
+    <com.bdajaya.adminku.ui.components.CardInputView
+        android:id="@+id/stockInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:civ_title="@string/stock"
+        app:civ_inputType="STOCK"
+        app:civ_hintText="0"
+        app:civ_showIcon="true"
+        app:civ_iconSrc="@drawable/ic_stack"
+        app:civ_positionGroup="first"/>
+
+    <!-- Unit Spinner -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/outline">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/unit"
+                android:textColor="@color/secondary_text"
+                android:textSize="12sp"/>
+
+            <Spinner
+                android:id="@+id/unitSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

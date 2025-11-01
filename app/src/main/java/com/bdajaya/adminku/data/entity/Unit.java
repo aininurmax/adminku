@@ -5,7 +5,11 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = "name", unique = true)})
+@Entity(indices = {
+        @Index(value = "name", unique = true),
+        @Index(value = "baseUnit"),
+        @Index(value = "isBaseUnit")
+})
 public class Unit {
     @PrimaryKey
     @NonNull
@@ -15,7 +19,7 @@ public class Unit {
     private String name;
 
     @NonNull
-    private String baseUnit; // "pcs" or "gram"
+    private String baseUnit; // "pcs" or "gr"
 
     private long conversionFactor; // 1 for base units, otherwise conversion to base
 
@@ -36,13 +40,10 @@ public class Unit {
         this.updatedAt = updatedAt;
     }
 
+    // Getters
     @NonNull
     public String getId() {
         return id;
-    }
-
-    public void setId(@NonNull String id) {
-        this.id = id;
     }
 
     @NonNull
@@ -50,49 +51,112 @@ public class Unit {
         return name;
     }
 
-    public void setName(@NonNull String name) {
-        this.name = name;
-    }
-
     @NonNull
     public String getBaseUnit() {
         return baseUnit;
-    }
-
-    public void setBaseUnit(@NonNull String baseUnit) {
-        this.baseUnit = baseUnit;
     }
 
     public long getConversionFactor() {
         return conversionFactor;
     }
 
-    public void setConversionFactor(long conversionFactor) {
-        this.conversionFactor = conversionFactor;
-    }
-
     public boolean isBaseUnit() {
         return isBaseUnit;
-    }
-
-    public void setBaseUnit(boolean baseUnit) {
-        isBaseUnit = baseUnit;
     }
 
     public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public long getUpdatedAt() {
         return updatedAt;
+    }
+
+    // Setters
+    public void setId(@NonNull String id) {
+        this.id = id;
+    }
+
+    public void setName(@NonNull String name) {
+        this.name = name;
+    }
+
+    public void setBaseUnit(@NonNull String baseUnit) {
+        this.baseUnit = baseUnit;
+    }
+
+    public void setConversionFactor(long conversionFactor) {
+        this.conversionFactor = conversionFactor;
+    }
+
+    public void setBaseUnit(boolean baseUnit) {
+        isBaseUnit = baseUnit;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
-}
 
+    // Helper methods
+    /**
+     * Convert quantity to base unit
+     */
+    public long toBaseUnit(long quantity) {
+        return quantity * conversionFactor;
+    }
+
+    /**
+     * Convert quantity from base unit
+     */
+    public long fromBaseUnit(long baseQuantity) {
+        if (conversionFactor == 0) {
+            return 0;
+        }
+        return baseQuantity / conversionFactor;
+    }
+
+    /**
+     * Get display text for unit
+     */
+    public String getDisplayText() {
+        if (isBaseUnit) {
+            return name + " (Base)";
+        }
+        return name + " (" + conversionFactor + " " + baseUnit + ")";
+    }
+
+    /**
+     * Check if compatible with another unit
+     */
+    public boolean isCompatibleWith(Unit other) {
+        return this.baseUnit.equals(other.baseUnit);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Unit unit = (Unit) o;
+        return id.equals(unit.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Unit{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", baseUnit='" + baseUnit + '\'' +
+                ", conversionFactor=" + conversionFactor +
+                ", isBaseUnit=" + isBaseUnit +
+                '}';
+    }
+}

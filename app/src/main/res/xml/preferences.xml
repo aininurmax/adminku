@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:title="Data Management">
+
+        <Preference
+            android:key="category_management"
+            android:title="@string/category_management"
+            android:summary="Manage product categories" />
+
+        <Preference
+            android:key="unit_management"
+            android:title="@string/unit_management"
+            android:summary="Manage product units" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Store">
+
+        <Preference
+            android:key="store_settings"
+            android:title="@string/store_settings"
+            android:summary="Configure store information" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Application">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="dark_mode"
+            android:summary="Enable dark mode"
+            android:title="Dark Mode" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="notifications"
+            android:summary="Enable app notifications"
+            android:title="Notifications" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="About">
+
+        <Preference
+            android:key="app_version"
+            android:summary="1.0.0"
+            android:title="Version" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

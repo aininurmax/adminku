@@ -3,7 +3,6 @@ package com.bdajaya.adminku.ui.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -11,48 +10,123 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bdajaya.adminku.R;
+import com.bdajaya.adminku.core.Constants;
+import com.bdajaya.adminku.core.ErrorHandler;
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.repository.CategoryRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * RecyclerView adapter for displaying categories with improved error handling and null safety.
+ * This adapter handles category display, click events, and provides better user experience.
+ *
+ * @author Adminku Development Team
+ * @version 2.0.0
+ */
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
     private List<Category> categories;
     private final CategoryClickListener listener;
-    private final int maxDepth;
 
-    public CategoryAdapter(List<Category> categories, CategoryClickListener listener, int maxDepth) {
-        this.categories = categories;
+    /**
+     * Creates a new CategoryAdapter with the given categories and click listener.
+     *
+     * @param categories The list of categories to display (can be null)
+     * @param listener The click listener for category interactions
+     */
+    public CategoryAdapter(List<Category> categories, CategoryClickListener listener) {
+        this.categories = categories != null ? new ArrayList<>(categories) : new ArrayList<>();
         this.listener = listener;
-        this.maxDepth = maxDepth;
     }
 
     @NonNull
     @Override
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_category, parent, false);
-        return new CategoryViewHolder(view);
+        try {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_category, parent, false);
+            return new CategoryViewHolder(view);
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Failed to create CategoryViewHolder", e);
+            // Fallback to a simple view if inflation fails
+            View fallbackView = new View(parent.getContext());
+            return new CategoryViewHolder(fallbackView);
+        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
+        if (position < 0 || position >= categories.size()) {
+            ErrorHandler.logWarning("Invalid position in onBindViewHolder: " + position, null);
+            return;
+        }
+
         Category category = categories.get(position);
-        holder.bind(category);
+        if (category != null) {
+            holder.bind(category);
+        } else {
+            ErrorHandler.logWarning("Null category at position: " + position, null);
+            holder.bindEmpty();
+        }
     }
 
     @Override
     public int getItemCount() {
-        return categories.size();
+        return categories != null ? categories.size() : 0;
     }
 
+    /**
+     * Updates the adapter data with null safety.
+     *
+     * @param newCategories The new list of categories (can be null)
+     */
     public void updateData(List<Category> newCategories) {
-        this.categories = newCategories;
+        this.categories = newCategories != null ? new ArrayList<>(newCategories) : new ArrayList<>();
         notifyDataSetChanged();
+    }
+
+    /**
+     * Safely adds a category to the list.
+     *
+     * @param category The category to add
+     */
+    public void addCategory(Category category) {
+        if (category != null) {
+            if (this.categories == null) {
+                this.categories = new ArrayList<>();
+            }
+            this.categories.add(category);
+            notifyItemInserted(this.categories.size() - 1);
+        }
+    }
+
+    /**
+     * Safely removes a category from the list.
+     *
+     * @param position The position to remove
+     */
+    public void removeCategory(int position) {
+        if (this.categories != null && position >= 0 && position < this.categories.size()) {
+            this.categories.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    /**
+     * Gets a category at the specified position safely.
+     *
+     * @param position The position to get
+     * @return The category or null if not found
+     */
+    public Category getCategory(int position) {
+        if (categories != null && position >= 0 && position < categories.size()) {
+            return categories.get(position);
+        }
+        return null;
     }
 
     public interface CategoryClickListener {
@@ -64,72 +138,139 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     class CategoryViewHolder extends RecyclerView.ViewHolder {
         private final TextView nameTextView;
         private final ImageView chevronImageView;
-        private final Button selectButton;
-        private final Button addSubcategoryButton;
-        private final CategoryRepository categoryRepository;
+        private CategoryRepository categoryRepository;
 
         CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            // Safely find views with null checks
             nameTextView = itemView.findViewById(R.id.category_name_text_view);
             chevronImageView = itemView.findViewById(R.id.chevron_image_view);
-            selectButton = itemView.findViewById(R.id.select_button);
-            addSubcategoryButton = itemView.findViewById(R.id.add_subcategory_button);
 
-            // Get CategoryRepository from context
-            AppDatabase database = AppDatabase.getInstance(itemView.getContext());
-            categoryRepository = new CategoryRepository(database.categoryDao(), database.configDao());
+            // Initialize to null first
+            categoryRepository = null;
+
+            try {
+                // Get CategoryRepository from context
+                AppDatabase database = AppDatabase.getInstance(itemView.getContext());
+                categoryRepository = new CategoryRepository(database.categoryDao());
+            } catch (Exception e) {
+                ErrorHandler.logError(ErrorHandler.ERROR_CODE_DATABASE, "Failed to initialize CategoryRepository in ViewHolder", e);
+                // categoryRepository already set to null above
+            }
         }
 
+        /**
+         * Binds category data to the view with comprehensive error handling.
+         *
+         * @param category The category to bind
+         */
         void bind(Category category) {
-            nameTextView.setText(category.getName());
+            if (category == null) {
+                bindEmpty();
+                return;
+            }
 
-            // Periksa status children dari database
-            boolean hasChildren = checkCategoryChildren(category);
-            // Update visibility berdasarkan level dan status children
-            updateButtonVisibility(category, hasChildren);
+            try {
+                // Safely set category name
+                if (nameTextView != null) {
+                    String categoryName = category.getName();
+                    nameTextView.setText(categoryName != null ? categoryName : "Unnamed Category");
+                }
 
-            setupClickListeners(category, hasChildren);
+                // Determine category properties with null safety
+                boolean hasChildren = category.hasChildren();
+                boolean isSelectable = !hasChildren;
+
+                // Update UI based on category state
+                updateButtonVisibility(hasChildren, isSelectable);
+                setupClickListeners(category, hasChildren, isSelectable);
+
+            } catch (Exception e) {
+                ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Failed to bind category: " + category.getId(), e);
+                bindEmpty();
+            }
         }
 
-        private void updateButtonVisibility(Category category, boolean hasChildren) {
-            chevronImageView.setVisibility(hasChildren ? View.VISIBLE : View.GONE);
-
-            // Tampilkan tombol select hanya jika tidak memiliki children
-            selectButton.setVisibility(hasChildren ? View.GONE : View.VISIBLE);
-
-            // Tampilkan tombol add subcategory berdasarkan level
-            boolean canAddSubcategory = category.getLevel() < maxDepth;
-            addSubcategoryButton.setVisibility(canAddSubcategory ? View.VISIBLE : View.GONE);
+        /**
+         * Binds an empty state when category data is unavailable.
+         */
+        void bindEmpty() {
+            if (nameTextView != null) {
+                nameTextView.setText("Loading...");
+            }
+            if (chevronImageView != null) {
+                chevronImageView.setVisibility(View.GONE);
+            }
         }
 
-        private void setupClickListeners(Category category, boolean hasChildren) {
+        /**
+         * Updates button visibility based on category state.
+         *
+         * @param hasChildren Whether the category has children
+         * @param isSelectable Whether the category is selectable
+         */
+        private void updateButtonVisibility(boolean hasChildren, boolean isSelectable) {
+            if (chevronImageView != null) {
+                // Show chevron only if category has children
+                chevronImageView.setVisibility(hasChildren ? View.VISIBLE : View.GONE);
+            }
+        }
+
+        /**
+         * Sets up click listeners for the category item.
+         *
+         * @param category The category
+         * @param hasChildren Whether the category has children
+         * @param isSelectable Whether the category is selectable
+         */
+        private void setupClickListeners(Category category, boolean hasChildren, boolean isSelectable) {
+            if (listener == null || category == null) {
+                return;
+            }
+
+            // Click listener: if has children, open; if not, select (if selectable)
             itemView.setOnClickListener(v -> {
-                listener.onCategoryClick(category, hasChildren);
+                try {
+                    if (hasChildren) {
+                        listener.onCategoryClick(category, true);
+                    } else if (isSelectable) {
+                        listener.onCategoryClick(category, false);
+                    }
+                } catch (Exception e) {
+                    ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error in category click listener", e);
+                }
             });
 
+            // Long click listener for showing bottom sheet options
             itemView.setOnLongClickListener(v -> {
-                listener.onCategoryLongClick(category);
-                return true;
-            });
-
-            selectButton.setOnClickListener(v -> {
-                listener.onCategoryClick(category, false);
-            });
-
-            addSubcategoryButton.setOnClickListener(v -> {
-                if (category.getLevel() < maxDepth) {
-                    listener.onAddSubcategoryClick(category);
+                try {
+                    listener.onCategoryLongClick(category);
+                    return true;
+                } catch (Exception e) {
+                    ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error in category long click listener", e);
+                    return false;
                 }
             });
         }
 
+        /**
+         * Checks if a category has children with error handling.
+         *
+         * @param category The category to check
+         * @return true if the category has children
+         */
         private boolean checkCategoryChildren(Category category) {
+            if (categoryRepository == null || category == null) {
+                return false;
+            }
+
             try {
-                // Use CategoryRepository to check if category has children
-                return categoryRepository.getChildCategoriesSync(category.getId()).size() > 0;
+                List<Category> children = categoryRepository.getChildCategoriesSync(category.getId());
+                return children != null && !children.isEmpty();
             } catch (Exception e) {
-                // Fallback to simple level check if database query fails
-                return category.getLevel() < maxDepth - 1;
+                ErrorHandler.logWarning("Failed to check category children for: " + category.getId(), e.getMessage());
+                return false;
             }
         }
     }

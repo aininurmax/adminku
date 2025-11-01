@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/product_image_view"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@string/product_image"
+            android:scaleType="centerCrop"
+            android:background="@color/image_background"
+            tools:src="@drawable/ic_image_placeholder" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/product_name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/primary_text"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="Product Name Example" />
+
+            <TextView
+                android:id="@+id/product_barcode_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/secondary_text"
+                android:textSize="12sp"
+                tools:text="BE-12345678" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Price -->
+                <TextView
+                    android:id="@+id/product_price_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Rp 50,000" />
+
+                <!-- Divider -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:text="•"
+                    android:textColor="@color/divider"
+                    android:textSize="12sp" />
+
+                <!-- Stock and Unit Container -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stock_badge">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_stack"
+                        android:tint="@color/stock_icon"
+                        android:contentDescription="@string/stock_icon"
+                        android:layout_marginEnd="4dp"/>
+
+                    <TextView
+                        android:id="@+id/product_stock_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/stock_text"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="100" />
+
+                    <TextView
+                        android:id="@+id/product_unit_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:textColor="@color/unit_text"
+                        android:textSize="12sp"
+                        tools:text="pcs" />
+                </LinearLayout>
+
+                <!-- Divider -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:text="•"
+                    android:textColor="@color/divider"
+                    android:textSize="12sp" />
+
+                <!-- Category -->
+                <TextView
+                    android:id="@+id/product_category_text_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="12sp"
+                    tools:text="Fashion" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

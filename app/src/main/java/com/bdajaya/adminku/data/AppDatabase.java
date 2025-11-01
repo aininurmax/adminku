@@ -9,14 +9,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
-import com.bdajaya.adminku.data.dao.CategoryDao;
-import com.bdajaya.adminku.data.dao.ConfigDao;
-import com.bdajaya.adminku.data.dao.ProductDao;
-import com.bdajaya.adminku.data.dao.ProductImageDao;
-import com.bdajaya.adminku.data.entity.Category;
-import com.bdajaya.adminku.data.entity.Config;
-import com.bdajaya.adminku.data.entity.Product;
-import com.bdajaya.adminku.data.entity.ProductImage;
+import com.bdajaya.adminku.data.dao.*;
+import com.bdajaya.adminku.data.entity.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,8 +19,10 @@ import java.util.concurrent.Executors;
         Product.class,
         ProductImage.class,
         Category.class,
-        Config.class
-}, version = 2, exportSchema = true)
+        Unit.class,
+        StockTransaction.class,
+        Brand.class
+}, version = 5, exportSchema = true)
 @TypeConverters({DateConverter.class, StringListConverter.class})
 public abstract class AppDatabase extends RoomDatabase  {
     private static final String DATABASE_NAME = "adminku_db";
@@ -36,24 +32,25 @@ public abstract class AppDatabase extends RoomDatabase  {
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            // Create Config table
-            database.execSQL("CREATE TABLE IF NOT EXISTS Config (" +
-                    "`key` TEXT NOT NULL, " +
-                    "`value` TEXT NOT NULL, " +
-                    "PRIMARY KEY(`key`))");
-
-            // Insert default config values
-            database.execSQL("INSERT OR REPLACE INTO Config (`key`, `value`) VALUES ('max_category_depth', '5')");
-        }
-    };
-
     public abstract ProductDao productDao();
     public abstract ProductImageDao productImageDao();
     public abstract CategoryDao categoryDao();
-    public abstract ConfigDao configDao();
+    public abstract UnitDao unitDao();
+    public abstract StockTransactionDao stockTransactionDao();
+    public abstract BrandDao brandDao();
+
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Rename kolom lama dan tambahkan metadata baru
+            database.execSQL("ALTER TABLE ProductImage RENAME COLUMN imageBase64 TO imagePath");
+            database.execSQL("ALTER TABLE ProductImage ADD COLUMN fileSize INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE ProductImage ADD COLUMN width INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE ProductImage ADD COLUMN height INTEGER NOT NULL DEFAULT 0");
+
+            // Note: Data lama akan invalid, perlu migrasi manual
+        }
+    };
 
     public static AppDatabase getInstance(final Context context) {
         if (INSTANCE == null) {
@@ -63,8 +60,7 @@ public abstract class AppDatabase extends RoomDatabase  {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     DATABASE_NAME)
-                            .addMigrations(MIGRATION_1_2)
-                            .addCallback(new RoomDatabase.Callback() {
+                            .addCallback(new Callback() {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
@@ -74,6 +70,7 @@ public abstract class AppDatabase extends RoomDatabase  {
                                     });
                                 }
                             })
+                            .addMigrations(MIGRATION_4_5)
                             .build();
                 }
             }

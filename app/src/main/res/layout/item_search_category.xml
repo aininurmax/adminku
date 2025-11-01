@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="2dp"
+    app:cardBackgroundColor="@color/card_background"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp">
 
@@ -12,14 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/category_name_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/primary_text"
+            android:textColor="@color/text_primary_light_dark"
             tools:text="Category Name" />
 
         <TextView
