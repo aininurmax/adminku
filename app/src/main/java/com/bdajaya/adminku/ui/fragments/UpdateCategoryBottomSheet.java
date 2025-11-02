@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,30 +17,34 @@ import com.bdajaya.adminku.R;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.ui.components.CardInputView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 
+/**
+ * Bottom sheet fragment for updating an existing category.
+ * Pre-populates the form with existing category data for editing.
+ *
+ * @author Adminku Development Team
+ * @version 2.0.0
+ */
 public class UpdateCategoryBottomSheet extends BottomSheetDialogFragment {
-
-    @Override
-    public int getTheme() {
-        return R.style.BottomSheetDialogTheme;
-    }
 
     public interface OnCategoryUpdateListener {
         void onCategoryUpdated(String categoryId, String newName);
         void onCancel();
     }
 
-    private static final String ARG_CATEGORY = "category";
+    private static final String ARG_CATEGORY_ID = "category_id";
+    private static final String ARG_CATEGORY_NAME = "category_name";
 
-    private Category category;
     private OnCategoryUpdateListener listener;
+    private CardInputView categoryNameEditText;
+    private String categoryId;
+    private String originalCategoryName;
 
     public static UpdateCategoryBottomSheet newInstance(Category category) {
         UpdateCategoryBottomSheet fragment = new UpdateCategoryBottomSheet();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_CATEGORY, category);
+        args.putString(ARG_CATEGORY_ID, category.getId());
+        args.putString(ARG_CATEGORY_NAME, category.getName());
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,70 +53,48 @@ public class UpdateCategoryBottomSheet extends BottomSheetDialogFragment {
         this.listener = listener;
     }
 
-    @Deprecated
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                category = getArguments().getParcelable(ARG_CATEGORY, Category.class);
-            } else {
-                category = getArguments().getParcelable(ARG_CATEGORY);
-            }
+            categoryId = getArguments().getString(ARG_CATEGORY_ID);
+            originalCategoryName = getArguments().getString(ARG_CATEGORY_NAME);
         }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = LayoutInflater.from(requireContext()).inflate(
-            R.layout.dialog_update_category, container, false);
+        View view = inflater.inflate(R.layout.dialog_update_category, container, false);
 
-        // Setup views
-        setupDialogViews(view);
+        categoryNameEditText = view.findViewById(R.id.category_name_edit_text);
+        Button updateButton = view.findViewById(R.id.btn_update);
+        Button cancelButton = view.findViewById(R.id.btn_cancel);
 
-        // Setup buttons
-        setupDialogButtons(view);
-
-        return view;
-    }
-
-    private void setupDialogViews(View view) {
-        if (category != null) {
-            // Set current category name in the input field
-            CardInputView categoryNameEditText = view.findViewById(R.id.category_name_edit_text);
-            if (categoryNameEditText != null) {
-                categoryNameEditText.setText(category.getName());
-            }
+        // Pre-populate with existing category name
+        if (originalCategoryName != null) {
+            categoryNameEditText.setText(originalCategoryName);
         }
-    }
 
-    private void setupDialogButtons(View view) {
-        MaterialButton btnCancel = view.findViewById(R.id.btn_cancel);
-        MaterialButton btnUpdate = view.findViewById(R.id.btn_update);
-        CardInputView categoryNameEditText = view.findViewById(R.id.category_name_edit_text);
+        // Setup click listeners
+        updateButton.setOnClickListener(v -> {
+            String newCategoryName = categoryNameEditText != null ? categoryNameEditText.getText().toString().trim() : "";
+            if (validateInput(newCategoryName)) {
+                if (listener != null) {
+                    listener.onCategoryUpdated(categoryId, newCategoryName);
+                }
+                dismissBottomSheet();
+            }
+        });
 
-        btnCancel.setOnClickListener(v -> {
+        cancelButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onCancel();
             }
             dismissBottomSheet();
         });
 
-        btnUpdate.setOnClickListener(v -> {
-            String newCategoryName = categoryNameEditText != null ? categoryNameEditText.getText().toString().trim() : "";
-
-            if (!newCategoryName.isEmpty() && category != null) {
-                if (listener != null) {
-                    listener.onCategoryUpdated(category.getId(), newCategoryName);
-                }
-                dismissBottomSheet();
-            } else {
-                if (categoryNameEditText != null) {
-                    categoryNameEditText.setError("Nama kategori tidak boleh kosong");
-                }
-            }
-        });
+        return view;
     }
 
     private void dismissBottomSheet() {
@@ -143,7 +127,40 @@ public class UpdateCategoryBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
-    public Category getCategory() {
-        return category;
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Show keyboard automatically and select all text
+        categoryNameEditText.requestFocus();
+        categoryNameEditText.selectAll();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
+    }
+
+    private boolean validateInput(String categoryName) {
+        if (categoryName.isEmpty()) {
+            Toast.makeText(getContext(), "Nama kategori tidak boleh kosong", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (categoryName.length() < 2) {
+            Toast.makeText(getContext(), "Nama kategori minimal 2 karakter", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (categoryName.length() > 100) {
+            Toast.makeText(getContext(), "Nama kategori maksimal 100 karakter", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Check if name actually changed
+        if (originalCategoryName != null && originalCategoryName.equals(categoryName)) {
+            Toast.makeText(getContext(), "Nama kategori tidak berubah", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 }

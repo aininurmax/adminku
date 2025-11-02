@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bdajaya.adminku.databinding.FragmentCategoryOptionsBottomSheetBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class CategoryOptionsBottomSheet extends BottomSheetDialogFragment {
@@ -28,6 +28,7 @@ public class CategoryOptionsBottomSheet extends BottomSheetDialogFragment {
     private static final String ARG_CATEGORY_ID = "category_id";
     private static final String ARG_CATEGORY_NAME = "category_name";
 
+    private FragmentCategoryOptionsBottomSheetBinding binding;
     private String categoryId;
     private String categoryName;
     private OnCategoryOptionSelectedListener listener;
@@ -57,43 +58,36 @@ public class CategoryOptionsBottomSheet extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = LayoutInflater.from(requireContext()).inflate(
-            com.bdajaya.adminku.R.layout.fragment_category_options_bottom_sheet, container, false);
+        binding = FragmentCategoryOptionsBottomSheetBinding.inflate(inflater, container, false);
 
-        Button addSubButton = view.findViewById(com.bdajaya.adminku.R.id.addsub_button);
-        Button updateButton = view.findViewById(com.bdajaya.adminku.R.id.update_button);
-        Button deleteButton = view.findViewById(com.bdajaya.adminku.R.id.delete_button);
-        Button cancelButton = view.findViewById(com.bdajaya.adminku.R.id.cancel_button);
-
-        addSubButton.setOnClickListener(v -> {
+        binding.addsubButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onAddSubcategory();
             }
             dismissBottomSheet();
         });
 
-        updateButton.setOnClickListener(v -> {
+        binding.updateButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onUpdateCategory();
             }
             dismissBottomSheet();
         });
 
-        deleteButton.setOnClickListener(v -> {
+        binding.deleteButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteCategory();
             }
             dismissBottomSheet();
         });
 
-        cancelButton.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onCancel();
-            }
-            dismissBottomSheet();
-        });
+        return binding.getRoot();
+    }
 
-        return view;
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     private void dismissBottomSheet() {

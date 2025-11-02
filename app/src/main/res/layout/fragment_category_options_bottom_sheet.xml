@@ -3,96 +3,87 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fitsSystemWindows="true"
-    android:background="@color/card_background">
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <LinearLayout
+        android:id="@+id/addsub_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:paddingHorizontal="16dp">
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
-        <!-- Header -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/edit"
+            android:src="@android:drawable/ic_input_add"
+            app:tint="@color/primary_text" />
+
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:text="Pilih Opsi"
-            android:textColor="@color/primary_text"
-            android:textSize="16sp"
-            android:gravity="center" />
-
-        <!-- Add Sub Category -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <!-- Add Category -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/addsub_button"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="0dp"
-                android:layout_height="66dp"
-                android:layout_weight="1"
-                android:background="@color/white"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="Tambah"
-                android:textColor="@color/primary_text"
-                app:icon="@android:drawable/ic_input_add"
-                app:iconGravity="textTop"
-                app:iconSize="24dp"
-                app:iconTint="@color/primary_text" />
-
-            <!-- Update Category -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/update_button"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="0dp"
-                android:layout_height="66dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="Ubah"
-                android:textColor="@color/primary_text"
-                app:icon="@drawable/ic_menu_edit"
-                app:iconGravity="textTop"
-                app:iconSize="24dp"
-                app:iconTint="@color/primary_text" />
-
-            <!-- Delete Category -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/delete_button"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="0dp"
-                android:layout_height="66dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="Hapus"
-                android:textColor="@color/primary_text"
-                app:icon="@drawable/ic_menu_delete"
-                app:iconGravity="textTop"
-                app:iconSize="24dp"
-                app:iconTint="@color/primary_text" />
-        </LinearLayout>
-
-        <!-- Cancel Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/cancel_button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/primary"
-            android:gravity="center"
-            android:text="Batal" />
+            android:layout_marginStart="16dp"
+            android:text="Tambah"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
 
     </LinearLayout>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/update_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/edit"
+            android:src="@drawable/ic_menu_edit"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Ubah"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/delete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_menu_delete"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Hapus"
+            android:textAppearance="@style/TextAppearance.Adminku.Body1"
+            android:textColor="@color/primary_text" />
+
+    </LinearLayout>
+
+
+    </LinearLayout>

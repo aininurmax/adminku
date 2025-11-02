@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/card_background"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <LinearLayout
         android:id="@+id/update_option"
@@ -14,9 +13,7 @@
         android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:padding="8dp">
 
         <ImageView
             android:layout_width="24dp"
@@ -42,9 +39,7 @@
         android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:padding="8dp">
 
         <ImageView
             android:layout_width="24dp"
