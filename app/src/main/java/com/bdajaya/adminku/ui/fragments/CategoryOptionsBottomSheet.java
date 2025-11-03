@@ -13,11 +13,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class CategoryOptionsBottomSheet extends BottomSheetDialogFragment {
 
-    @Override
-    public int getTheme() {
-        return com.bdajaya.adminku.R.style.BottomSheetDialogTheme;
-    }
-
     public interface OnCategoryOptionSelectedListener {
         void onAddSubcategory();
         void onUpdateCategory();

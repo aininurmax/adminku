@@ -2,7 +2,6 @@ package com.bdajaya.adminku.ui.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.bdajaya.adminku.data.AppDatabase;
@@ -10,9 +9,12 @@ import com.bdajaya.adminku.data.entity.Product;
 import com.bdajaya.adminku.data.model.ProductWithDetails;
 import com.bdajaya.adminku.data.repository.ProductRepository;
 
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 
+@HiltViewModel
 public class ProductManagementViewModel extends ViewModel {
 
     private final ProductRepository productRepository;
@@ -27,6 +29,7 @@ public class ProductManagementViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
+    @Inject
     public ProductManagementViewModel(ProductRepository productRepository) {
         this.productRepository = productRepository;
 

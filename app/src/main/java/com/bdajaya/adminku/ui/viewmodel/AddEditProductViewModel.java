@@ -5,22 +5,24 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import java.util.Date; // Add Date import
+
+import javax.inject.Inject;
 
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Product;
 
+import com.bdajaya.adminku.data.entity.Unit;
 import com.bdajaya.adminku.data.repository.BrandRepository;
 import com.bdajaya.adminku.data.repository.CategoryRepository;
 import com.bdajaya.adminku.data.repository.ProductRepository;
 import com.bdajaya.adminku.data.repository.UnitRepository;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
-import com.bdajaya.adminku.data.entity.Unit;
 
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class AddEditProductViewModel extends ViewModel {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
@@ -66,7 +68,13 @@ public class AddEditProductViewModel extends ViewModel {
         this.unitRepository = null; // Will be injected if available
     }
 
-    public AddEditProductViewModel(ProductRepository productRepository, CategoryRepository categoryRepository, BrandRepository brandRepository, UnitRepository unitRepository) {
+    @Inject
+    public AddEditProductViewModel(
+            ProductRepository productRepository,
+            CategoryRepository categoryRepository,
+            BrandRepository brandRepository,
+            UnitRepository unitRepository
+    ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.brandRepository = brandRepository;

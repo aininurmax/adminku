@@ -33,16 +33,17 @@ import com.bdajaya.adminku.databinding.ActivityProductManagementBinding;
 import com.bdajaya.adminku.databinding.DialogPriceStockBinding;
 import com.bdajaya.adminku.ui.adapter.ProductTabAdapter;
 import com.bdajaya.adminku.ui.viewmodel.ProductManagementViewModel;
-import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 import com.bdajaya.adminku.util.CurrencyFormatter;
 import com.bdajaya.adminku.util.ProductShareHelper;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayoutMediator;
+import dagger.hilt.android.AndroidEntryPoint;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@AndroidEntryPoint
 public class ProductManagementActivity extends AppCompatActivity {
 
     private ActivityProductManagementBinding binding;
@@ -92,14 +93,7 @@ public class ProductManagementActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        AdminkuApplication application = (AdminkuApplication) getApplication();
-        FactoryViewModel factory = new FactoryViewModel(
-                application.getProductRepository(),
-                application.getCategoryRepository(),
-                application.getBrandRepository(),
-                application.getUnitRepository()
-        );
-        viewModel = new ViewModelProvider(this, factory).get(ProductManagementViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ProductManagementViewModel.class);
     }
 
     private void setupViewPager() {

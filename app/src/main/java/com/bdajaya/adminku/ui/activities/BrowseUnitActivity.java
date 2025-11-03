@@ -9,16 +9,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
 import com.bdajaya.adminku.databinding.ActivityBrowseUnitBinding;
 import com.bdajaya.adminku.databinding.DialogAddEditUnitBinding;
 import com.bdajaya.adminku.ui.adapter.UnitAdapter;
-import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 import com.bdajaya.adminku.ui.viewmodel.UnitViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class BrowseUnitActivity extends AppCompatActivity {
     private ActivityBrowseUnitBinding binding;
     private UnitViewModel viewModel;
@@ -51,14 +51,7 @@ public class BrowseUnitActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        AdminkuApplication app = (AdminkuApplication) getApplication();
-        FactoryViewModel factory = new FactoryViewModel(
-                app.getProductRepository(),
-                app.getCategoryRepository(),
-                app.getBrandRepository(),
-                app.getUnitRepository()
-        );
-        viewModel = new ViewModelProvider(this, factory).get(UnitViewModel.class);
+        viewModel = new ViewModelProvider(this).get(UnitViewModel.class);
     }
 
     private void setupRecyclerView() {
@@ -176,7 +169,7 @@ public class BrowseUnitActivity extends AppCompatActivity {
         DialogAddEditUnitBinding dialogBinding = DialogAddEditUnitBinding.inflate(getLayoutInflater());
 
         dialogBinding.codeInput.setText(unit.getName());
-        dialogBinding.codeInput.setEnabled(false); // Kode tidak bisa diubah
+        dialogBinding.codeInput.setEnabled(false);
         dialogBinding.nameInput.setText(unit.getName());
         dialogBinding.quantityInput.setText(String.valueOf(unit.getConversionFactor()));
 
@@ -186,7 +179,7 @@ public class BrowseUnitActivity extends AppCompatActivity {
         } else {
             dialogBinding.baseUnitSpinner.setSelection(1);
         }
-        dialogBinding.baseUnitSpinner.setEnabled(false); // Base unit tidak bisa diubah
+        dialogBinding.baseUnitSpinner.setEnabled(false);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle("Edit Satuan Unit")

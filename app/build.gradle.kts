@@ -6,6 +6,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    id("com.google.dagger.hilt.android") version "2.48"
+    kotlin("kapt")
 }
 
 // Load keystore properties dari file terpisah (tidak di-commit ke Git)
@@ -137,6 +139,19 @@ android {
             buildConfigField("boolean", "ENABLE_LOGGING", "false")
         }
 
+        // Build type khusus development
+        create("development") {
+            initWith(getByName("debug"))
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
+            matchingFallbacks += listOf("debug")
+
+            // Nonaktifkan lint dan testing untuk build development
+            enableUnitTestCoverage = false
+            enableAndroidTestCoverage = false
+        }
+
 
         debug {
             isMinifyEnabled = false
@@ -148,6 +163,13 @@ android {
 
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+        }
+
+        // Nonaktifkan untuk debug builds
+        splits {
+            abi {
+                isEnable = false
+            }
         }
 
     }
@@ -182,7 +204,14 @@ android {
                 "/META-INF/NOTICE*",
                 "**/kotlin/**",
                 "**/DebugProbesKt.bin",
-                "META-INF/versions/9/previous-compilation-data.bin"
+                "META-INF/versions/9/previous-compilation-data.bin",
+                "META-INF/*.version",
+                "**/*.proto"
+            )
+
+            // Untuk debug, kurangin eksklusi untuk mempercepat
+            pickFirsts += setOf(
+                "**/META-INF/kotlin-stdlib-*.kotlin_module"
             )
         }
         jniLibs {
@@ -241,6 +270,9 @@ fun setupDebugKeystore(signingConfig: com.android.build.api.dsl.SigningConfig) {
 }
 
 dependencies {
+    // Hilt dependencies
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 
     // Core library desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

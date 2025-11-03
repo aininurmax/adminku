@@ -16,6 +16,8 @@ import com.bdajaya.adminku.data.model.Breadcrumb;
 import com.bdajaya.adminku.data.model.CategoryWithPath;
 import com.bdajaya.adminku.data.repository.CategoryRepository;
 import com.bdajaya.adminku.domain.service.CategoryService;
+import dagger.hilt.android.lifecycle.HiltViewModel;
+import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,10 @@ import java.util.concurrent.Future;
  * @author Adminku Development Team
  * @version 2.1.0
  */
+@HiltViewModel
 public class BrowseCategoryViewModel extends ViewModel {
+
+
 
     private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
@@ -51,6 +56,7 @@ public class BrowseCategoryViewModel extends ViewModel {
      * @param categoryRepository The category repository for data access
      * @param categoryService The category service for business logic
      */
+    @Inject
     public BrowseCategoryViewModel(CategoryRepository categoryRepository, CategoryService categoryService) {
         this.categoryRepository = categoryRepository;
         this.categoryService = categoryService;
@@ -87,6 +93,10 @@ public class BrowseCategoryViewModel extends ViewModel {
 
     public LiveData<String> getErrorMessage() {
         return errorMessageLiveData;
+    }
+
+    public LiveData<List<Category>> getRootCategories() {
+        return categoryService.getRootCategoriesLive();
     }
 
     /**

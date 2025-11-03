@@ -7,13 +7,17 @@ import androidx.lifecycle.ViewModel;
 import com.bdajaya.adminku.core.Result;
 import com.bdajaya.adminku.data.entity.Unit;
 import com.bdajaya.adminku.domain.service.UnitService;
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import java.util.List;
+import javax.inject.Inject;
 
+@HiltViewModel
 public class UnitViewModel extends ViewModel {
     private final UnitService unitService;
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>("");
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
+    @Inject
     public UnitViewModel(UnitService unitService) {
         this.unitService = unitService;
     }

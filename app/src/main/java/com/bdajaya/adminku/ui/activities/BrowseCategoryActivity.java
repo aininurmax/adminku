@@ -11,9 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -30,7 +27,6 @@ import com.bdajaya.adminku.core.ValidationUtils;
 import com.bdajaya.adminku.data.entity.Category;
 import com.bdajaya.adminku.data.model.Breadcrumb;
 import com.bdajaya.adminku.data.model.CategoryWithPath;
-import com.bdajaya.adminku.data.repository.CategoryRepository;
 import com.bdajaya.adminku.databinding.ActivityBrowseCategoryBinding;
 import com.bdajaya.adminku.ui.adapter.BreadcrumbAdapter;
 import com.bdajaya.adminku.ui.adapter.CategoryAdapter;
@@ -40,13 +36,12 @@ import com.bdajaya.adminku.ui.fragments.CategoryOptionsBottomSheet;
 import com.bdajaya.adminku.ui.fragments.ConfirmationBottomSheet;
 import com.bdajaya.adminku.ui.fragments.UpdateCategoryBottomSheet;
 import com.bdajaya.adminku.ui.viewmodel.BrowseCategoryViewModel;
-import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * Activity for browsing and managing categories with improved architecture and error handling.
@@ -55,6 +50,7 @@ import java.util.List;
  * @author Adminku Development Team
  * @version 2.1.0
  */
+@AndroidEntryPoint
 public class BrowseCategoryActivity extends AppCompatActivity {
 
     private ActivityBrowseCategoryBinding binding;
@@ -66,7 +62,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
 
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private boolean isUpdatingBreadcrumb = false;
-    private Category currentSelectedCategory; // Untuk menyimpan kategori yang dipilih
+    private Category currentSelectedCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,9 +120,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        AdminkuApplication application = (AdminkuApplication) getApplication();
-        FactoryViewModel factory = new FactoryViewModel(application.getCategoryRepository());
-        viewModel = new ViewModelProvider(this, factory).get(BrowseCategoryViewModel.class);
+        viewModel = new ViewModelProvider(this).get(BrowseCategoryViewModel.class);
     }
 
     private void setupRecyclerViews() {
@@ -200,14 +194,10 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                // Not needed
-            }
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                // Don't do anything on reselection to avoid infinite loops
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
@@ -217,9 +207,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     private void setupSearchView() {
         binding.searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No action needed
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -241,9 +229,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                // No action needed
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         binding.clearSearchButton.setOnClickListener(v -> {
@@ -324,7 +310,7 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     private void updateCategoryList(List<Category> categories) {
         categoryAdapter.updateData(categories);
         updateEmptyViewVisibility(false);
-        invalidateOptionsMenu(); // Update menu items based on current level
+        invalidateOptionsMenu();
     }
 
     private void updateSearchState(boolean isSearching) {

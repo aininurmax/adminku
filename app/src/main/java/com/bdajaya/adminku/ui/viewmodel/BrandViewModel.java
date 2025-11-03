@@ -2,26 +2,26 @@ package com.bdajaya.adminku.ui.viewmodel;
 
 import android.os.Handler;
 import android.os.Looper;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.bdajaya.adminku.core.Result;
 import com.bdajaya.adminku.data.entity.Brand;
-import com.bdajaya.adminku.data.repository.BrandRepository;
 import com.bdajaya.adminku.domain.service.BrandService;
-
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import java.util.List;
+import javax.inject.Inject;
 
+@HiltViewModel
 public class BrandViewModel extends ViewModel {
     private final BrandService brandService;
     private final MutableLiveData<List<Brand>> brands = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
-    public BrandViewModel(BrandRepository brandRepository) {
-        this.brandService = new BrandService(brandRepository);
+    @Inject
+    public BrandViewModel(BrandService brandService) {
+        this.brandService = brandService;
         loadBrands();
     }
 

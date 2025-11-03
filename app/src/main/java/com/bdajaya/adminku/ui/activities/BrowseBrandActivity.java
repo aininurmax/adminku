@@ -1,6 +1,5 @@
 package com.bdajaya.adminku.ui.activities;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,8 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -21,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
 import com.bdajaya.adminku.core.Constants;
 import com.bdajaya.adminku.core.ErrorHandler;
@@ -33,10 +29,11 @@ import com.bdajaya.adminku.ui.fragments.BrandOptionsBottomSheet;
 import com.bdajaya.adminku.ui.fragments.ConfirmationBottomSheet;
 import com.bdajaya.adminku.ui.fragments.UpdateBrandBottomSheet;
 import com.bdajaya.adminku.ui.viewmodel.BrandViewModel;
-import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * Activity for browsing and managing brands with improved architecture and error handling.
@@ -45,13 +42,12 @@ import java.util.List;
  * @author Adminku Development Team
  * @version 2.0.0
  */
+@AndroidEntryPoint
 public class BrowseBrandActivity extends AppCompatActivity {
 
     private ActivityBrowseBrandBinding binding;
     private BrandViewModel viewModel;
-
     private BrandAdapter brandAdapter;
-
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
 
     @Override
@@ -100,9 +96,7 @@ public class BrowseBrandActivity extends AppCompatActivity {
     }
 
     private void setupViewModel() {
-        AdminkuApplication application = (AdminkuApplication) getApplication();
-        FactoryViewModel factory = new FactoryViewModel(application.getBrandRepository());
-        viewModel = new ViewModelProvider(this, factory).get(BrandViewModel.class);
+        viewModel = new ViewModelProvider(this).get(BrandViewModel.class);
     }
 
     private void setupRecyclerViews() {

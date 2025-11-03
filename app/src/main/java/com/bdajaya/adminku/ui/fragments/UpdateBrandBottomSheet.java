@@ -125,7 +125,7 @@ public class UpdateBrandBottomSheet extends BottomSheetDialogFragment {
             }
         } catch (Exception e) {
             // Log error but don't crash the app
-            android.util.Log.e("UpdateCategoryBottomSheet", "Error hiding keyboard", e);
+            android.util.Log.e("UpdateBrandBottomSheet", "Error hiding keyboard", e);
         }
     }
 

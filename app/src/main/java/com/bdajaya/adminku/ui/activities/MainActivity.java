@@ -16,9 +16,10 @@ import com.bdajaya.adminku.ui.fragments.ProductFragment;
 import com.bdajaya.adminku.ui.fragments.HomeFragment;
 
 import org.jetbrains.annotations.NotNull;
-
+import dagger.hilt.android.AndroidEntryPoint;
 import nl.joery.animatedbottombar.AnimatedBottomBar;
 
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     AnimatedBottomBar animatedBottomBar;

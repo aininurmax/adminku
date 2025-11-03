@@ -29,7 +29,6 @@ import com.bdajaya.adminku.data.manager.ImageStorageManager;
 import com.bdajaya.adminku.databinding.ActivityAddEditProductBinding;
 import com.bdajaya.adminku.databinding.DialogPhotoPreviewBinding;
 import com.bdajaya.adminku.ui.viewmodel.AddEditProductViewModel;
-import com.bdajaya.adminku.ui.viewmodel.FactoryViewModel;
 import com.bdajaya.adminku.util.CurrencyFormatter;
 import com.bumptech.glide.Glide;
 import com.yalantis.ucrop.UCrop;
@@ -37,6 +36,9 @@ import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class AddEditProductActivity extends AppCompatActivity {
     private static final String STATUS_LIVE = "LIVE";
     private static final String STATUS_ARCHIVED = "ARCHIVED";
@@ -98,17 +100,7 @@ public class AddEditProductActivity extends AppCompatActivity {
 
     private void setupViewModel() {
         try {
-            if (!(getApplication() instanceof AdminkuApplication)) {
-                throw new IllegalStateException("Application must be AdminkuApplication");
-            }
-            AdminkuApplication application = (AdminkuApplication) getApplication();
-            FactoryViewModel factory = new FactoryViewModel(
-                    application.getProductRepository(),
-                    application.getCategoryRepository(),
-                    application.getBrandRepository(),
-                    application.getUnitRepository()
-            );
-            viewModel = new ViewModelProvider(this, factory).get(AddEditProductViewModel.class);
+            viewModel = new ViewModelProvider(this).get(AddEditProductViewModel.class);
 
             observeCategorySelection();
             observeBrandSelection();
@@ -229,14 +221,13 @@ public class AddEditProductActivity extends AppCompatActivity {
 
     private void setupCategoryDisplay() {
         try {
-            selectedCategoryName = binding.categorySelect.findViewById(R.id.category_name_text_view);
-            selectedCategoryPath = binding.categorySelect.findViewById(R.id.category_path_text_view);
-
-            if (selectedCategoryName != null) {
-                selectedCategoryName.setText("Select Category");
+            if (binding.categorySelect.findViewById(R.id.category_name_text_view) != null) {
+                android.widget.TextView categoryNameView = binding.categorySelect.findViewById(R.id.category_name_text_view);
+                categoryNameView.setText("Select Category");
             }
-            if (selectedCategoryPath != null) {
-                selectedCategoryPath.setText("No category selected");
+            if (binding.categorySelect.findViewById(R.id.category_path_text_view) != null) {
+                android.widget.TextView categoryPathView = binding.categorySelect.findViewById(R.id.category_path_text_view);
+                categoryPathView.setText("No category selected");
             }
         } catch (Exception e) {
             Log.e("AddEditProductActivity", "Error setting up category display", e);
@@ -245,34 +236,42 @@ public class AddEditProductActivity extends AppCompatActivity {
 
     private void setupBrandDisplay() {
         try {
-            selectedBrandName = binding.brandSelect.findViewById(R.id.brand_name_text_view);
-            if (selectedBrandName != null) {
-                selectedBrandName.setText("Select Brand");
+            if (binding.brandSelect.findViewById(R.id.brand_name_text_view) != null) {
+                android.widget.TextView brandNameView = binding.brandSelect.findViewById(R.id.brand_name_text_view);
+                brandNameView.setText("Select Brand");
             }
         } catch (Exception e) {
             Log.e("AddEditProductActivity", "Error setting up brand display", e);
-            selectedBrandName = null;
         }
     }
 
     private void observeCategorySelection() {
         viewModel.getCategoryName().observe(this, name -> {
-            if (name != null && !name.isEmpty() && selectedCategoryName != null) {
-                selectedCategoryName.setText(name);
+            if (name != null && !name.isEmpty()) {
+                if (binding.categorySelect.findViewById(R.id.category_name_text_view) != null) {
+                    android.widget.TextView categoryNameView = binding.categorySelect.findViewById(R.id.category_name_text_view);
+                    categoryNameView.setText(name);
+                }
             }
         });
 
         viewModel.getCategoryPath().observe(this, path -> {
-            if (path != null && !path.isEmpty() && selectedCategoryPath != null) {
-                selectedCategoryPath.setText(path);
+            if (path != null && !path.isEmpty()) {
+                if (binding.categorySelect.findViewById(R.id.category_path_text_view) != null) {
+                    android.widget.TextView categoryPathView = binding.categorySelect.findViewById(R.id.category_path_text_view);
+                    categoryPathView.setText(path);
+                }
             }
         });
     }
 
     private void observeBrandSelection() {
         viewModel.getBrandName().observe(this, name -> {
-            if (name != null && !name.isEmpty() && selectedBrandName != null) {
-                selectedBrandName.setText(name);
+            if (name != null && !name.isEmpty()) {
+                if (binding.brandSelect.findViewById(R.id.brand_name_text_view) != null) {
+                    android.widget.TextView brandNameView = binding.brandSelect.findViewById(R.id.brand_name_text_view);
+                    brandNameView.setText(name);
+                }
             }
         });
     }
@@ -408,7 +407,7 @@ public class AddEditProductActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.unsaved_changes_title)
                 .setMessage(R.string.unsaved_changes_message)
-            .setPositiveButton(R.string.unsaved_changes_leave, (dialog, which) -> {
+                .setPositiveButton(R.string.unsaved_changes_leave, (dialog, which) -> {
                     hasUnsavedChanges = false;
                     finish();
                 })

@@ -1,53 +1,36 @@
 package com.bdajaya.adminku;
 
 import android.app.Application;
-
-import android.content.Context;
-import com.bdajaya.adminku.data.manager.ImageStorageManager;
 import com.bdajaya.adminku.data.AppDatabase;
-import com.bdajaya.adminku.data.repository.BrandRepository;
-import com.bdajaya.adminku.data.repository.CategoryRepository;
-import com.bdajaya.adminku.data.repository.ProductRepository;
-import com.bdajaya.adminku.data.repository.StockRepository;
-import com.bdajaya.adminku.data.repository.UnitRepository;
+import com.bdajaya.adminku.data.manager.ImageStorageManager;
+import com.bdajaya.adminku.data.repository.*;
+import dagger.hilt.android.HiltAndroidApp;
+import javax.inject.Inject;
 
+@HiltAndroidApp
 public class AdminkuApplication extends Application {
-
     private static AdminkuApplication instance;
-    private AppDatabase database;
-    private ProductRepository productRepository;
-    private CategoryRepository categoryRepository;
-    private BrandRepository brandRepository;
-    private UnitRepository unitRepository;
-    private StockRepository stockRepository;
+
+    @Inject AppDatabase appDatabase;
+    @Inject ProductRepository productRepository;
+    @Inject CategoryRepository categoryRepository;
+    @Inject BrandRepository brandRepository;
+    @Inject UnitRepository unitRepository;
+    @Inject StockRepository stockRepository;
+    @Inject ImageStorageManager imageStorageManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
-
-        // Initialize database
-        database = AppDatabase.getInstance(this);
-
-        // Initialize repositories
-        productRepository = new ProductRepository(
-                this,
-                database.productDao(),
-                database.productImageDao()
-        );
-        categoryRepository = new CategoryRepository(database.categoryDao());
-        brandRepository = new BrandRepository(database.brandDao());
-        unitRepository = new UnitRepository(database.unitDao());
-        stockRepository = new StockRepository(database.stockTransactionDao(), unitRepository);
-
     }
 
     public static AdminkuApplication getInstance() {
         return instance;
     }
 
-    public AppDatabase getDatabase() {
-        return database;
+    public AppDatabase getAppDatabase() {
+        return appDatabase;
     }
 
     public ProductRepository getProductRepository() {
@@ -58,6 +41,10 @@ public class AdminkuApplication extends Application {
         return categoryRepository;
     }
 
+    public BrandRepository getBrandRepository() {
+        return brandRepository;
+    }
+
     public UnitRepository getUnitRepository() {
         return unitRepository;
     }
@@ -66,15 +53,7 @@ public class AdminkuApplication extends Application {
         return stockRepository;
     }
 
-    public BrandRepository getBrandRepository() {
-        return brandRepository;
-    }
-
-    public AppDatabase getAppDatabase() {
-        return database;
-    }
-
     public ImageStorageManager getImageStorageManager() {
-        return new ImageStorageManager(this);
+        return imageStorageManager;
     }
 }
