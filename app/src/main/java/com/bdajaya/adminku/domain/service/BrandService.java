@@ -7,10 +7,14 @@ import com.bdajaya.adminku.data.entity.Brand;
 import com.bdajaya.adminku.data.repository.BrandRepository;
 
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class BrandService {
     private final BrandRepository brandRepository;
 
+    @Inject
     public BrandService(BrandRepository brandRepository) {
         this.brandRepository = brandRepository;
     }

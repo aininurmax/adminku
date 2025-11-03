@@ -17,11 +17,13 @@ public class BrandViewModel extends ViewModel {
     private final BrandService brandService;
     private final MutableLiveData<List<Brand>> brands = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
     @Inject
     public BrandViewModel(BrandService brandService) {
         this.brandService = brandService;
+
+        // Initially load brands
         loadBrands();
     }
 
@@ -73,7 +75,7 @@ public class BrandViewModel extends ViewModel {
                 Result<String> result = brandService.addBrand(name);
                 if (result.isSuccess()) {
                     // Reload the list on main thread
-                    new Handler(Looper.getMainLooper()).post(() -> loadBrands());
+                    new Handler(Looper.getMainLooper()).post(this::loadBrands);
                 } else {
                     errorMessage.postValue(result.getErrorMessage());
                 }
@@ -94,7 +96,7 @@ public class BrandViewModel extends ViewModel {
                 Result<Void> result = brandService.updateBrand(brandId, name);
                 if (result.isSuccess()) {
                     // Reload the list on main thread
-                    new Handler(Looper.getMainLooper()).post(() -> loadBrands());
+                    new Handler(Looper.getMainLooper()).post(this::loadBrands);
                 } else {
                     errorMessage.postValue(result.getErrorMessage());
                 }
@@ -115,7 +117,7 @@ public class BrandViewModel extends ViewModel {
                 Result<Void> result = brandService.deleteBrand(brandId);
                 if (result.isSuccess()) {
                     // Reload the list on main thread
-                    new Handler(Looper.getMainLooper()).post(() -> loadBrands());
+                    new Handler(Looper.getMainLooper()).post(this::loadBrands);
                 } else {
                     errorMessage.postValue(result.getErrorMessage());
                 }

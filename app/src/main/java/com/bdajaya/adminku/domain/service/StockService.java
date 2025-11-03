@@ -8,21 +8,29 @@ import com.bdajaya.adminku.data.entity.StockTransaction;
 import com.bdajaya.adminku.data.entity.Unit;
 import com.bdajaya.adminku.data.repository.StockRepository;
 import com.bdajaya.adminku.data.repository.UnitRepository;
+import dagger.hilt.internal.aggregatedroot.codegen._com_bdajaya_adminku_AdminkuApplication;
+
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Service for managing stock transactions with unit conversion.
  * Ensures all stock is stored in base units for consistency.
  */
+@Singleton
 public class StockService {
     private final StockRepository stockRepository;
     private final UnitRepository unitRepository;
     private final UnitService unitService;
 
-    public StockService(StockRepository stockRepository, UnitRepository unitRepository) {
+    @Inject
+    public StockService(StockRepository stockRepository,
+                        UnitRepository unitRepository,
+                        UnitService unitService) {
         this.stockRepository = stockRepository;
         this.unitRepository = unitRepository;
-        this.unitService = new UnitService(unitRepository);
+        this.unitService = unitService;
     }
 
     /**

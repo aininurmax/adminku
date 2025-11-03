@@ -23,17 +23,7 @@ public class UnitViewModel extends ViewModel {
     }
 
     public LiveData<List<Unit>> getUnits() {
-        return Transformations.switchMap(searchQuery, query -> {
-            if (query == null || query.trim().isEmpty()) {
-                return unitService.getAllUnits();
-            } else {
-                return unitService.searchUnitsLive(query);
-            }
-        });
-    }
-
-    public void searchUnits(String query) {
-        searchQuery.setValue(query);
+        return unitService.getAllUnits();
     }
 
     public void addUnit(String code, String name, String baseUnit, long quantity) {
@@ -55,6 +45,10 @@ public class UnitViewModel extends ViewModel {
         if (result.isFailure()) {
             errorMessage.setValue(result.getErrorMessage());
         }
+    }
+
+    public void searchUnits(String query) {
+        searchQuery.setValue(query);
     }
 
     public LiveData<String> getErrorMessage() {

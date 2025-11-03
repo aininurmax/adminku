@@ -12,7 +12,10 @@ import com.bdajaya.adminku.data.repository.UnitRepository;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class UnitService {
     private final UnitRepository unitRepository;
 
@@ -20,6 +23,7 @@ public class UnitService {
     public static final String BASE_UNIT_PCS = "pcs";
     public static final String BASE_UNIT_GRAM = "gr";
 
+    @Inject
     public UnitService(UnitRepository unitRepository) {
         this.unitRepository = unitRepository;
         initializeDefaultUnits();
