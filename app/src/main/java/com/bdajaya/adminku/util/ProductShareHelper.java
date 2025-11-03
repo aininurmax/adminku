@@ -248,7 +248,7 @@ public class ProductShareHelper {
      */
     private static void scheduleCleanup(Context context) {
         // Create one-time work request untuk cleanup cache
-        WorkRequest cleanupWorkRequest = new OneTimeWorkRequest.Builder(ShareCacheCleanupWorker.class)
+        WorkRequest cleanupWorkRequest = new OneTimeWorkRequest.Builder(ShareCacheCleanup.class)
                 .setInitialDelay(SHARE_COMPLETION_CLEANUP_DELAY_MINUTES, TimeUnit.MINUTES)
                 .build();
 

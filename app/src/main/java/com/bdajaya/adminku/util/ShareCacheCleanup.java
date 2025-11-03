@@ -13,11 +13,11 @@ import com.bdajaya.adminku.AdminkuApplication;
  * Background worker untuk cleanup share cache setelah share selesai.
  * Menggunakan WorkManager untuk ensure reliability dan scheduling.
  */
-public class ShareCacheCleanupWorker extends Worker {
+public class ShareCacheCleanup extends Worker {
 
-    private static final String TAG = "ShareCacheCleanupWorker";
+    private static final String TAG = "ShareCacheCleanup";
 
-    public ShareCacheCleanupWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public ShareCacheCleanup(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
