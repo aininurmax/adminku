@@ -123,12 +123,30 @@ public class AddEditProductViewModel extends ViewModel {
                     productSellPriceLiveData.postValue(product.getSellPrice());
                     productStockLiveData.postValue(product.getStock());
 
-                    // Load category name if available
+                    // Load category name and path if available
                     if (product.getCategoryId() != null && !product.getCategoryId().isEmpty()) {
                         var category = categoryRepository.getCategoryByIdSync(product.getCategoryId());
                         categoryName.postValue(category != null ? category.getName() : "");
+
+                        // Load category path to root
+                        if (categoryRepository != null) {
+                            var pathToRoot = categoryRepository.pathToRoot(product.getCategoryId());
+                            if (pathToRoot != null && !pathToRoot.isEmpty()) {
+                                StringBuilder pathBuilder = new StringBuilder();
+                                for (int i = pathToRoot.size() - 1; i >= 0; i--) {
+                                    pathBuilder.append(pathToRoot.get(i).getName());
+                                    if (i > 0) {
+                                        pathBuilder.append(" > ");
+                                    }
+                                }
+                                categoryPath.postValue(pathBuilder.toString());
+                            } else {
+                                categoryPath.postValue("");
+                            }
+                        }
                     } else {
                         categoryName.postValue("");
+                        categoryPath.postValue("");
                     }
 
                     // Load brand name

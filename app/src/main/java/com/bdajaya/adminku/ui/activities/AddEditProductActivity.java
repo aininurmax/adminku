@@ -49,9 +49,6 @@ public class AddEditProductActivity extends AppCompatActivity {
     private AddEditProductViewModel viewModel;
     private ImageStorageManager imageStorage;
 
-    private TextView selectedCategoryName;
-    private TextView selectedCategoryPath;
-    private TextView selectedBrandName;
     private boolean hasUnsavedChanges = false;
     private boolean isPopulatingUi = false;
     private int pendingCropIndex = RecyclerView.NO_POSITION;
@@ -200,6 +197,8 @@ public class AddEditProductActivity extends AppCompatActivity {
             }
         });
 
+        // AWAS! Kalau nanti nama kategori berubah, dan namanya tidak kosong, dan sedang mode edit
+        // maka tampilkan nama baru itu di layar dengan cara yang aman.
         viewModel.getCategoryName().observe(this, categoryName -> {
             if (categoryName != null && !categoryName.trim().isEmpty() && viewModel.isEditMode()) {
                 updateUiSafely(() -> binding.categorySelect.setPrimaryText(categoryName));
@@ -256,11 +255,8 @@ public class AddEditProductActivity extends AppCompatActivity {
         });
 
         viewModel.getCategoryPath().observe(this, path -> {
-            if (path != null && !path.isEmpty()) {
-                if (binding.categorySelect.findViewById(R.id.category_path_text_view) != null) {
-                    android.widget.TextView categoryPathView = binding.categorySelect.findViewById(R.id.category_path_text_view);
-                    categoryPathView.setText(path);
-                }
+            if (path != null && !path.isEmpty() && viewModel.isEditMode()) {
+                binding.categorySelect.setSecondaryText(path);
             }
         });
     }
