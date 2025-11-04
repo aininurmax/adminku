@@ -47,6 +47,11 @@ public interface ProductDao {
     @Query("SELECT COUNT(*) FROM Product WHERE categoryId = :categoryId")
     int countByCategoryId(String categoryId);
 
+    /**
+     * Legacy LIKE-based search (kept for backward compatibility).
+     * Note: LIKE '%term%' cannot use normal index efficiently.
+     * Prefer searchFts(...) for performance on larger datasets.
+     */
     @Query("SELECT * FROM Product WHERE name LIKE '%' || :query || '%' OR barcode LIKE '%' || :query || '%' ORDER BY name LIMIT :limit")
     List<Product> search(String query, int limit);
 
@@ -65,8 +70,17 @@ public interface ProductDao {
     LiveData<List<ProductWithDetails>> getProductsWithDetailsByStatus(String status);
 
     @Transaction
-    @Query("SELECT * FROM Product WHERE name LIKE '%' || :query || '%' OR barcode LIKE '%' || :query || '%' ORDER BY name LIMIT :limit")
-    List<ProductWithDetails> searchWithDetails(String query, int limit);
+    @Query("SELECT * FROM Product WHERE id IN (SELECT docid FROM ProductFts WHERE ProductFts MATCH :query) ORDER BY name LIMIT :limit")
+    List<ProductWithDetails> searchWithDetailsUsingFts(String query, int limit);
+
+    /**
+     * New FTS-based product search returning product rows.
+     * This uses the FTS virtual table (ProductFts) and will be much faster on text searches.
+     *
+     * NOTE: caller must format query for MATCH operator (e.g. "term*" for prefix search).
+     */
+    @Query("SELECT * FROM Product WHERE id IN (SELECT docid FROM ProductFts WHERE ProductFts MATCH :query) ORDER BY name LIMIT :limit")
+    List<Product> searchFts(String query, int limit);
 
     @Query("UPDATE Product SET status = :status WHERE id = :id")
     void updateStatus(String id, String status);

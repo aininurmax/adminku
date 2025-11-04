@@ -15,6 +15,8 @@ import com.bdajaya.adminku.data.entity.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.bdajaya.adminku.db.migration.Migrations.MIGRATION_5_6;
+
 @Database(entities = {
         Product.class,
         ProductImage.class,
@@ -39,19 +41,6 @@ public abstract class AppDatabase extends RoomDatabase  {
     public abstract StockTransactionDao stockTransactionDao();
     public abstract BrandDao brandDao();
 
-    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            // Rename kolom lama dan tambahkan metadata baru
-            database.execSQL("ALTER TABLE ProductImage RENAME COLUMN imageBase64 TO imagePath");
-            database.execSQL("ALTER TABLE ProductImage ADD COLUMN fileSize INTEGER NOT NULL DEFAULT 0");
-            database.execSQL("ALTER TABLE ProductImage ADD COLUMN width INTEGER NOT NULL DEFAULT 0");
-            database.execSQL("ALTER TABLE ProductImage ADD COLUMN height INTEGER NOT NULL DEFAULT 0");
-
-            // Note: Data lama akan invalid, perlu migrasi manual
-        }
-    };
-
     public static AppDatabase getInstance(final Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -70,7 +59,7 @@ public abstract class AppDatabase extends RoomDatabase  {
                                     });
                                 }
                             })
-                            .addMigrations(MIGRATION_4_5)
+                            .addMigrations(MIGRATION_5_6)
                             .build();
                 }
             }
