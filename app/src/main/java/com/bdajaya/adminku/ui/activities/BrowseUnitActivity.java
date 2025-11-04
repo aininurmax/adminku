@@ -31,7 +31,14 @@ public class BrowseUnitActivity extends AppCompatActivity {
         binding = ActivityBrowseUnitBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        isSelectionMode = getIntent().getBooleanExtra("selectionMode", false);
+        // Check unit_management preference for default mode
+        // If unit_management=true: show management UI (selectionMode=false)
+        // If unit_management=false: show selection UI (selectionMode=true)
+        android.content.SharedPreferences preferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+        boolean unitManagementEnabled = preferences.getBoolean("unit_management", false);
+
+        // Default selectionMode based on preference (inverse of unit_management)
+        isSelectionMode = !unitManagementEnabled;
 
         setupToolbar();
         setupViewModel();

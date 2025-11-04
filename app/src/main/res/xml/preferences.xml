@@ -10,10 +10,11 @@
             android:title="@string/category_management"
             android:summary="Manage product categories" />
 
-        <Preference
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:key="unit_management"
-            android:title="@string/unit_management"
-            android:summary="Manage product units" />
+            android:summary="Enable unit management mode"
+            android:title="@string/unit_management" />
 
     </PreferenceCategory>
 

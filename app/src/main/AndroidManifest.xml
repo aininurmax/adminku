@@ -74,6 +74,11 @@
             android:theme="@style/Theme.Adminku.NoActionBar" />
 
         <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Adminku.NoActionBar" />
+
+        <activity
             android:name=".ui.activities.ProductManagementActivity"
             android:parentActivityName=".ui.activities.MainActivity"
             android:exported="false"

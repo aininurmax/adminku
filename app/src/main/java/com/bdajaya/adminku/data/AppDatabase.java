@@ -23,8 +23,9 @@ import static com.bdajaya.adminku.db.migration.Migrations.MIGRATION_5_6;
         Category.class,
         Unit.class,
         StockTransaction.class,
-        Brand.class
-}, version = 5, exportSchema = true)
+        Brand.class,
+        ProductFts.class
+}, version = 6, exportSchema = true)
 @TypeConverters({DateConverter.class, StringListConverter.class})
 public abstract class AppDatabase extends RoomDatabase  {
     private static final String DATABASE_NAME = "adminku_db";
@@ -40,6 +41,7 @@ public abstract class AppDatabase extends RoomDatabase  {
     public abstract UnitDao unitDao();
     public abstract StockTransactionDao stockTransactionDao();
     public abstract BrandDao brandDao();
+    public abstract ProductFtsDao productFtsDao();
 
     public static AppDatabase getInstance(final Context context) {
         if (INSTANCE == null) {

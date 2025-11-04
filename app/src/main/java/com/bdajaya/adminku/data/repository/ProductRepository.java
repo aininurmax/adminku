@@ -76,7 +76,7 @@ public class ProductRepository {
     }
 
     public List<ProductWithDetails> searchProductsWithDetails(String query, int limit) {
-        return productDao.searchWithDetails(query, limit);
+        return productDao.searchWithDetailsUsingFts(query, limit);
     }
 
     // ================================

@@ -617,6 +617,11 @@ public class ProductManagementActivity extends AppCompatActivity {
             getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
+        if (item.getItemId() == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
