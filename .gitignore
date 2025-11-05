@@ -92,6 +92,29 @@ obj/
 .idea/gradle.xml
 .idea/jarRepositories.xml
 .idea/navEditor.xml
+.idea/runConfigurations.xml
+.idea/markdown-navigator.xml
+.idea/gradleTasks.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default_with_sonarlint.xml
+.idea/sonarlint/
+# IntelliJ/Android Studio project files
+.idea/.name
+.idea/AndroidProjectSystem.xml
+.idea/checkstyle-idea.xml
+.idea/compiler.xml
+.idea/copilot.data.migration.*.xml
+.idea/deploymentTargetSelector.xml
+.idea/deviceManager.xml
+.idea/google-java-format.xml
+.idea/gradle.xml
+.idea/jsonSchemas.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/runConfigurations.xml
+.idea/vcs.xml
+.idea/workspace.xml
 
 # Legacy Eclipse project files
 .classpath

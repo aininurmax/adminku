@@ -53,4 +53,8 @@
 
     // ic name
     <color name="buzMavisi">#0099ff</color>
+
+    //Dialog Confirmation
+    <color name="warning_color">#FFA000</color>
+    <color name="error_color">#ffff5722</color>
 </resources>

@@ -52,4 +52,26 @@
         <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
+    // Custom styles for dialog components can be added here as needed
+
+    <style name="DialogAnimation" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+
+    <style name="DialogAnimation.SlideUp">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:windowAnimationStyle">@style/DialogAnimation.Fade</item>
+    </style>
+
+    <style name="DialogAnimation.Fade">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+
 </resources>

@@ -31,10 +31,7 @@ import com.bdajaya.adminku.databinding.ActivityBrowseCategoryBinding;
 import com.bdajaya.adminku.ui.adapter.BreadcrumbAdapter;
 import com.bdajaya.adminku.ui.adapter.CategoryAdapter;
 import com.bdajaya.adminku.ui.adapter.SearchCategoryAdapter;
-import com.bdajaya.adminku.ui.fragments.AddCategoryBottomSheet;
-import com.bdajaya.adminku.ui.fragments.CategoryOptionsBottomSheet;
-import com.bdajaya.adminku.ui.fragments.ConfirmationBottomSheet;
-import com.bdajaya.adminku.ui.fragments.UpdateCategoryBottomSheet;
+import com.bdajaya.adminku.ui.fragments.*;
 import com.bdajaya.adminku.ui.viewmodel.BrowseCategoryViewModel;
 import com.google.android.material.tabs.TabLayout;
 
@@ -249,22 +246,6 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_category, menu);
         return true;
-    }
-
-    // Update method getAddCategoryMenuTitle untuk menggunakan depth
-    private String getAddCategoryMenuTitle(int currentDepth) {
-        switch (currentDepth) {
-            case 0:
-                return getString(R.string.add_main_category);
-            case 1:
-                return getString(R.string.add_subcategory);
-            case 2:
-                return getString(R.string.add_sub_subcategory);
-            case 3:
-                return getString(R.string.add_sub_sub_subcategory);
-            default:
-                return getString(R.string.add_category);
-        }
     }
 
     // PERBAIKI BARIS 262 - Extract common logic
@@ -605,35 +586,33 @@ public class BrowseCategoryActivity extends AppCompatActivity {
     private void showCustomConfirmationDialog(@NonNull Category category,
                                               @NonNull BrowseCategoryViewModel.CategoryDeletionInfo deletionInfo) {
         try {
-            // Create and show bottom sheet dengan semua informasi yang diperlukan
-            ConfirmationBottomSheet bottomSheet = ConfirmationBottomSheet.newInstance(
+            ConfirmationDialog dialog = ConfirmationDialog.newInstance(
                     category,
                     deletionInfo.hasChildren(),
                     deletionInfo.hasProducts(),
                     deletionInfo.getProductCount()
             );
 
-            bottomSheet.setOnConfirmationActionListener(new ConfirmationBottomSheet.OnConfirmationActionListener() {
+            dialog.setOnConfirmationActionListener(new ConfirmationDialog.OnConfirmationActionListener() {
                 @Override
-                public void onConfirmDelete(Object itemToDelete) {
-                    if (itemToDelete instanceof Category) {
-                        Category categoryToDelete = (Category) itemToDelete;
+                public void onConfirm(Object data) {
+                    if (data instanceof Category) {
+                        Category categoryToDelete = (Category) data;
                         deleteCategory(categoryToDelete);
                     }
                 }
 
                 @Override
                 public void onCancel() {
-                    // Clean up
                     currentSelectedCategory = null;
                 }
             });
 
-            bottomSheet.show(getSupportFragmentManager(), "ConfirmationBottomSheet");
+            dialog.show(getSupportFragmentManager(), "ConfirmationDialog");
 
         } catch (Exception e) {
             ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
-                    "Error showing confirmation bottom sheet", e);
+                    "Error showing confirmation dialog", e);
             Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
         }
     }

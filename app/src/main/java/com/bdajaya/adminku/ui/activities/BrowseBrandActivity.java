@@ -24,10 +24,7 @@ import com.bdajaya.adminku.core.ErrorHandler;
 import com.bdajaya.adminku.data.entity.Brand;
 import com.bdajaya.adminku.databinding.ActivityBrowseBrandBinding;
 import com.bdajaya.adminku.ui.adapter.BrandAdapter;
-import com.bdajaya.adminku.ui.fragments.AddBrandBottomSheet;
-import com.bdajaya.adminku.ui.fragments.BrandOptionsBottomSheet;
-import com.bdajaya.adminku.ui.fragments.ConfirmationBottomSheet;
-import com.bdajaya.adminku.ui.fragments.UpdateBrandBottomSheet;
+import com.bdajaya.adminku.ui.fragments.*;
 import com.bdajaya.adminku.ui.viewmodel.BrandViewModel;
 
 import java.util.ArrayList;
@@ -292,31 +289,28 @@ public class BrowseBrandActivity extends AppCompatActivity {
 
     private void showDeleteBrandConfirmation(Brand brand) {
         try {
-            ConfirmationBottomSheet bottomSheet = ConfirmationBottomSheet.newInstanceForBrand(brand);
-            bottomSheet.setOnConfirmationActionListener(new ConfirmationBottomSheet.OnConfirmationActionListener() {
+            ConfirmationDialog dialog = ConfirmationDialog.newInstanceForBrand(brand);
+
+            dialog.setOnConfirmationActionListener(new ConfirmationDialog.OnConfirmationActionListener() {
                 @Override
-                public void onConfirmDelete(Object itemToDelete) {
-                    if (itemToDelete instanceof Brand) {
-                        try {
-                            Brand brandToDelete = (Brand) itemToDelete;
-                            viewModel.deleteBrand(brandToDelete.getId());
-                        } catch (Exception e) {
-                            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error deleting brand", e);
-                            Toast.makeText(BrowseBrandActivity.this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
-                        }
+                public void onConfirm(Object data) {
+                    if (data instanceof Brand) {
+                        Brand brandToDelete = (Brand) data;
+                        viewModel.deleteBrand(brandToDelete.getId());
                     }
                 }
 
                 @Override
                 public void onCancel() {
-                    // Nothing to do, bottom sheet will dismiss automatically
+                    // Clean up
                 }
             });
 
-            bottomSheet.show(getSupportFragmentManager(), "ConfirmationBottomSheet");
+            dialog.show(getSupportFragmentManager(), "ConfirmationDialog");
 
         } catch (Exception e) {
-            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN, "Error showing confirmation bottom sheet", e);
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
+                    "Error showing confirmation dialog", e);
             Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
         }
     }

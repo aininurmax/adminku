@@ -11,4 +11,7 @@
     <dimen name="icon_size">20dp</dimen>
     <dimen name="gap">10dp</dimen>
 
+    // Dialog dimensions
+    <dimen name="dialog_horizontal_margin">24dp</dimen>
+
 </resources>

@@ -24,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bdajaya.adminku.AdminkuApplication;
 import com.bdajaya.adminku.R;
+import com.bdajaya.adminku.core.Constants;
+import com.bdajaya.adminku.core.ErrorHandler;
 import com.bdajaya.adminku.data.AppDatabase;
 import com.bdajaya.adminku.data.entity.Product;
 import com.bdajaya.adminku.data.entity.Unit;
@@ -32,6 +34,7 @@ import com.bdajaya.adminku.data.model.ProductWithDetails;
 import com.bdajaya.adminku.databinding.ActivityProductManagementBinding;
 import com.bdajaya.adminku.databinding.DialogPriceStockBinding;
 import com.bdajaya.adminku.ui.adapter.ProductTabAdapter;
+import com.bdajaya.adminku.ui.fragments.ConfirmationDialog;
 import com.bdajaya.adminku.ui.viewmodel.ProductManagementViewModel;
 import com.bdajaya.adminku.util.CurrencyFormatter;
 import com.bdajaya.adminku.util.ProductShareHelper;
@@ -543,15 +546,38 @@ public class ProductManagementActivity extends AppCompatActivity {
     }
 
     private void showDeleteConfirmationDialog(Product product) {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.confirm_delete)
-                .setMessage(getString(R.string.confirm_delete) + " " + product.getName() + "?")
-                .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    viewModel.deleteProduct(product);
-                    Toast.makeText(this, R.string.success, Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton(R.string.no, null)
-                .show();
+        try {
+            ConfirmationDialog dialog = ConfirmationDialog.newInstanceForProduct(
+                    product.getId(),
+                    product.getName()
+            );
+
+            dialog.setOnConfirmationActionListener(new ConfirmationDialog.OnConfirmationActionListener() {
+                @Override
+                public void onConfirm(Object data) {
+                    if (data instanceof ConfirmationDialog.ProductSimpleData) {
+                        ConfirmationDialog.ProductSimpleData productData =
+                                (ConfirmationDialog.ProductSimpleData) data;
+                        // Delete product using productData.id
+                        viewModel.deleteProduct(product); // atau gunakan productData.id
+                        Toast.makeText(ProductManagementActivity.this,
+                                R.string.success, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancel() {
+                    // Clean up
+                }
+            });
+
+            dialog.show(getSupportFragmentManager(), "ConfirmationDialog");
+
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
+                    "Error showing confirmation dialog", e);
+            Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void shareProduct(ProductWithDetails product) {

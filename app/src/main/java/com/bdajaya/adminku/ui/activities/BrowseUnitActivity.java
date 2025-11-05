@@ -5,14 +5,19 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bdajaya.adminku.R;
+import com.bdajaya.adminku.core.Constants;
+import com.bdajaya.adminku.core.ErrorHandler;
+import com.bdajaya.adminku.data.entity.Unit;
 import com.bdajaya.adminku.databinding.ActivityBrowseUnitBinding;
 import com.bdajaya.adminku.databinding.DialogAddEditUnitBinding;
 import com.bdajaya.adminku.ui.adapter.UnitAdapter;
+import com.bdajaya.adminku.ui.fragments.ConfirmationDialog;
 import com.bdajaya.adminku.ui.viewmodel.UnitViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -229,14 +234,36 @@ public class BrowseUnitActivity extends AppCompatActivity {
     }
 
     private void showDeleteConfirmation(com.bdajaya.adminku.data.entity.Unit unit) {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Hapus Satuan")
-                .setMessage("Yakin ingin menghapus satuan '" + unit.getName() + "'?")
-                .setPositiveButton("Hapus", (d, w) -> {
-                    viewModel.deleteUnit(unit.getId());
-                    Snackbar.make(binding.getRoot(), "Satuan berhasil dihapus", Snackbar.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Batal", (d, w) -> d.dismiss())
-                .show();
+        try {
+            ConfirmationDialog dialog = ConfirmationDialog.newInstanceForUnit(
+                    unit.getId(),
+                    unit.getName()
+            );
+
+            dialog.setOnConfirmationActionListener(new ConfirmationDialog.OnConfirmationActionListener() {
+                @Override
+                public void onConfirm(Object data) {
+                    if (data instanceof ConfirmationDialog.UnitSimpleData) {
+                        ConfirmationDialog.UnitSimpleData unitData =
+                                (ConfirmationDialog.UnitSimpleData) data;
+                        viewModel.deleteUnit(unitData.id);
+                        Snackbar.make(binding.getRoot(),
+                                "Satuan berhasil dihapus", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancel() {
+                    // Clean up
+                }
+            });
+
+            dialog.show(getSupportFragmentManager(), "ConfirmationDialog");
+
+        } catch (Exception e) {
+            ErrorHandler.logError(ErrorHandler.ERROR_CODE_UNKNOWN,
+                    "Error showing confirmation dialog", e);
+            Toast.makeText(this, Constants.ERROR_UNEXPECTED, Toast.LENGTH_SHORT).show();
+        }
     }
 }
